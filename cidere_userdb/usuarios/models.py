@@ -2,6 +2,7 @@ from django.db import models
 
 class Usuario(models.Model):
     nombre = models.CharField(max_length=100)
+    contraseña= models.CharField(max_length=100)
     rut_empresa = models.CharField(max_length=20, unique=True)  
     tipo_trabajo = models.CharField(max_length=50)
     tipo_empresa = models.CharField(max_length=50)
