@@ -15,6 +15,10 @@
             background-repeat: no-repeat;
             background-attachment: fixed; 
         }
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
     </style>
 
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
@@ -34,28 +38,47 @@
             <div id="login-row" class="row justify-content-center align-items-center">
                 <div id="login-column" class="col-md-6">
                     <div id="login-box" class="col-md-12">
-                        <form id="login-form" class="form" action="" method="post">
-                            <h3 class="text-center text-white pt-5">Inicio de Sesión</h3>
-                            <div class="form-group">
-                                <label for="username" class="text-white">Email:</label><br>
-                                <input type="text" name="username" id="username" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="password" class="text-white">Contraseña:</label><br>
-                                <input type="password" name="password" id="password" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label for="remember-me" class="text-white"><span>Recuerdame</span> <span><input id="remember-me" name="remember-me" type="checkbox"></span></label><br>
-                                <input type="submit" name="submit" class="btn btn-info btn-md" value="Iniciar Sesión">
-                            </div>
-                            <div id="register-link" class="text-right">
-                                <li><a href="{% url 'register' %}">¿No tienes cuenta? Registrate aquí</a></li>
-                            </div>
-                        </form>
+                        {% if request.user.is_authenticated %}
+                            <p>Bienvenido, {{ request.user.username }}! Ya has iniciado sesión.</p>
+                            <a href="{% url 'logout' %}">Cerrar Sesión</a>
+                        {% else %}
+                            {% if error %}
+                                <div class="error">{{ error }}</div>
+                            {% endif %}
+                            <form id="login-form" class="form" action="{% url 'login' %}" method="post" onsubmit="return validateForm()">
+                                {% csrf_token %}
+                                <h3 class="text-center text-white pt-5">Inicio de Sesión</h3>
+                                <div class="form-group">
+                                    <label for="email" class="text-white">Email:</label><br>
+                                    <input type="text" name="email" id="email" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password" class="text-white">Contraseña:</label><br>
+                                    <input type="password" name="password" id="password" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <input type="submit" name="submit" class="btn btn-info btn-md" value="Iniciar Sesión">
+                                </div>
+                                <div id="register-link" class="text-right">
+                                    <li><a href="{% url 'register' %}">¿No tienes cuenta? Registrate aquí</a></li>
+                                </div>
+                            </form>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        function validateForm() {
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+            if (email == "" || password == "") {
+                alert("Email y contraseña son obligatorios");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </body>
 </html>
