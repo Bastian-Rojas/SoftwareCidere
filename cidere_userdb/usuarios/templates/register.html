@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+    <title>Mercado Cidere Register</title>
+    <style>
+        body {
+            background-image: url("{% static 'images/camioncitos.png' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
+
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'assets/css/fontawesome.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/templatemo-mercado-cidere.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/owl.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/lightbox.css' %}">
+    
+    <script>
+    function validateForm() {
+        var username = document.getElementById('username').value;
+        var password = document.getElementById('password').value;
+        var repassword = document.getElementById('repassword').value;
+        if (username == "" || password == "" || repassword == "") {
+            alert("Todos los campos son obligatorios");
+            return false;
+        }
+        if (password != repassword) {
+            alert("Las contraseñas no coinciden");
+            return false;
+        }
+        return true;
+    }
+    </script>
+
+</head>
+<body>
+    <div id="register">
+        <div class="container">
+            <div id="register-row" class="row justify-content-center align-items-center">
+                <div id="register-column" class="col-md-6">
+                    <div id="register-box" class="col-md-12">
+                        <form id="register-form" class="form" action="{% url 'register' %}" method="post" onsubmit="return validateForm()">
+                            {% csrf_token %}
+                            {% if error %}
+                                <div class="error">{{ error }}</div>
+                            {% endif %}
+                            <h3 class="text-center text-white pt-5">Registro</h3>
+                            <div class="form-group">
+                                <label for="username" class="text-white">Nombre de la empresa:</label><br>
+                                <input type="text" name="username" id="username" class="form-control" placeholder="Patos INC.">
+                            </div>
+                            <div class="form-group">
+                                <label for="rutempresa" class="text-white">Rut de la empresa:</label><br>
+                                <input type="text" name="rutempresa" id="rutempresa" class="form-control" placeholder="11111111-1 (Sin puntos y con guion)">
+                            </div>
+                            <div class="form-group">
+                                <label for="tipoempresa" class="text-white">Tipo de empresa:</label><br>
+                                <input type="text" name="tipoempresa" id="tipoempresa" class="form-control" placeholder="Tronadura">
+                            </div>
+                            <div class="form-group">
+                                <label for="tipotrabajo" class="text-white">Tipo de trabajo:</label><br>
+                                <input type="text" name="tipotrabajo" id="tipotrabajo" class="form-control" placeholder="Tronadura">
+                            </div>
+                            <div class="form-group">
+                                <label for="servofre" class="text-white">Servicio ofrecido:</label><br>
+                                <input type="text" name="servofre" id="servofre" class="form-control" placeholder="Tronadura">
+                            </div>
+                            <div class="form-group">
+                                <label for="numcontact" class="text-white">Número de contacto:</label><br>
+                                <input type="text" name="numcontact" id="numcontact" class="form-control" placeholder="987654321">
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="text-white">Correo de contacto:</label><br>
+                                <input type="text" name="email" id="email" class="form-control" placeholder="patos@patos.cl">
+                            </div>
+                            <div class="form-group">
+                                <label for="descripcion" class="text-white">Descripción:</label><br>
+                                <input type="text" name="descripcion" id="descripcion" class="form-control" placeholder="Somos patos y tronamos piedra">
+                            </div>
+                            <div class="form-group">
+                                <label for="password" class="text-white">Contraseña:</label><br>
+                                <input type="password" name="password" id="password" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="repassword" class="text-white">Repetir contraseña:</label><br>
+                                <input type="password" name="repassword" id="repassword" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <input type="submit" name="submit" class="btn btn-info btn-md" value="Registrarse">
+                            </div>
+                            <div id="login-link" class="text-right">
+                                <li><a href="{% url 'login' %}">¿Ya tienes cuenta? Inicia sesión aquí</a></li>
+                            </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
