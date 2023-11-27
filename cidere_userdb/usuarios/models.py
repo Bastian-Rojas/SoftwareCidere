@@ -1,16 +1,67 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from django.core.exceptions import ValidationError
 from django.db import models
+import re
+
+def validate_rut(rut):
+    pattern = re.compile(r'^\d{2}\.\d{3}\.\d{3}-[\dkK]$')
+    if not pattern.match(rut):
+        raise ValidationError('Formato de RUT inválido. Debe ser como 77.627.982-K.')
+    
+# Modelos para regiones, provincias y comunas}
+
+class Tipo_Empresa(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+class Region(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+class Provincia(models.Model):
+    region = models.ForeignKey(Region, on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+class Comuna(models.Model):
+    provincia = models.ForeignKey(Provincia, on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+# Modelo para rubros de la empresa
+class Rubro(models.Model):
+    tipo_empresa = models.ForeignKey(Tipo_Empresa, on_delete=models.CASCADE)
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
+# Opciones para tamaños y tipos de empresa
+TAMANO_EMPRESA_OPCIONES = [
+    ('microempresa', 'Micro Empresa'),
+    ('pequena', 'Pequeña Empresa'),
+    ('mediana', 'Mediana Empresa'),
+    ('grande', 'Gran Empresa'),
+]
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, correo_contacto, password=None, **extra_fields):
-        if not correo_contacto:
-            raise ValueError('Los usuarios deben tener una dirección de correo electrónico')
-        user = self.model(correo_contacto=self.normalize_email(correo_contacto), **extra_fields)
+    def create_user(self, rut_empresa, password=None, **extra_fields):
+        if not rut_empresa:
+            raise ValueError('Los usuarios deben tener RUT de empresa')
+        user = self.model(rut_empresa=rut_empresa, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, correo_contacto, password=None, **extra_fields):
+    def create_superuser(self, rut_empresa, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
 
@@ -19,18 +70,22 @@ class CustomUserManager(BaseUserManager):
         if extra_fields.get('is_superuser') is not True:
             raise ValueError('Superuser debe tener is_superuser=True.')
 
-        return self.create_user(correo_contacto, password, **extra_fields)
+        return self.create_user(rut_empresa, password, **extra_fields)
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
-    nombre = models.CharField(max_length=100)
     rut_empresa = models.CharField(max_length=20, unique=True)  
-    tipo_trabajo = models.CharField(max_length=50)
-    tipo_empresa = models.CharField(max_length=50)
-    servicio_ofrecido = models.CharField(max_length=200)  
-    numero_contacto = models.CharField(max_length=20, unique=True) 
     correo_contacto = models.EmailField(unique=True)
-    descripcion = models.TextField()  
-    calificacion = models.DecimalField(max_digits=3, decimal_places=2, default=0.0)
+    nombre = models.CharField(max_length=100)
+    razon_social = models.CharField(max_length=100)
+    region = models.ForeignKey(Region, on_delete=models.SET_NULL, null=True)
+    provincia = models.ForeignKey(Provincia, on_delete=models.SET_NULL, null=True)
+    comuna = models.ForeignKey(Comuna, on_delete=models.SET_NULL, null=True)
+    direccion = models.CharField(max_length=200)
+    tipo_empresa = models.ForeignKey(Tipo_Empresa, on_delete=models.SET_NULL, null=True)
+    rubros = models.ManyToManyField(Rubro)
+    tamano_empresa = models.CharField(max_length=50, choices=TAMANO_EMPRESA_OPCIONES)
+    descripcion = models.TextField()
+    sitio_web = models.URLField(blank=True, null=True)
 
     # Campos requeridos por Django para el modelo de usuario
     is_staff = models.BooleanField(default=False)  # Indica si el usuario puede acceder al sitio de administración
@@ -38,8 +93,8 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'correo_contacto'
-    REQUIRED_FIELDS = ['nombre']
+    USERNAME_FIELD = 'rut_empresa'
+    REQUIRED_FIELDS = ['nombre','correo_contacto']
 
     def __str__(self):
         return self.nombre
