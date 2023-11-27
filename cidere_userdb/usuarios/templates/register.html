@@ -33,11 +33,10 @@
     
     <script>
     function validateForm() {
-        var rut_empresa = document.getElementById('rut_empresa').value;
-        var email = document.getElementById('email').value;
+        var username = document.getElementById('username').value;
         var password = document.getElementById('password').value;
         var repassword = document.getElementById('repassword').value;
-        if (rut_empresa == "" || email == "" || password == "" || repassword == "") {
+        if (username == "" || password == "" || repassword == "") {
             alert("Todos los campos son obligatorios");
             return false;
         }
@@ -47,70 +46,7 @@
         }
         return true;
     }
-    <script>
-        $(document).ready(function(){
-            $('#region').change(function(){
-                var url = '{% url "cargar_provincias" %}';
-                var regionId = $(this).val();
-        
-                $.ajax({
-                    url: url,
-                    data: {
-                        'region': regionId
-                    },
-                    success: function (data) {
-                        $("#provincia").html(data);
-                    }
-                });
-            });
-        });
-     </script>
-        
-     <script>
-            $(document).ready(function(){
-                $('#provincia').change(function(){
-                    var url = '{% url "cargar_comunas" %}';
-                    var provinciaId = $(this).val();
-            
-                    $.ajax({
-                        url: url,
-                        data: {
-                            'provincia': provinciaId
-                        },
-                        success: function (data) {
-                            $("#comuna").html(data);
-                        }
-                    });
-                });
-            });
-        </script>
-        
-        <script>
-                $(document).ready(function(){
-                    $('#comuna').change(function(){
-                        // Acciones adicionales si son necesarias
-                    });
-                });
-        </script>
-
-        <script>
-            $(document).ready(function(){
-                $('#tipoempresa').change(function(){
-                    var url = '{% url "cargar_rubros" %}';
-                    var tipoEmpresaId = $(this).val();
-            
-                    $..ajax({
-                        url: url,
-                        data: {
-                            'tipo_empresa': tipoEmpresaId
-                        },
-                        success: function (data) {
-                            $("#rubros").html(data);
-                        }
-                    });
-                });
-            });
-        </script>
+    </script>
 
 </head>
 <body>
@@ -125,100 +61,52 @@
                                 <div class="error">{{ error }}</div>
                             {% endif %}
                             <h3 class="text-center text-white pt-5">Registro</h3>
-
                             <div class="form-group">
-                                <label for="rut_empresa" class="text-white">RUT de la empresa:</label><br>
-                                <input type="text" name="rut_empresa" id="rut_empresa" class="form-control" placeholder="77.777.777-7">
+                                <label for="username" class="text-white">Nombre de la empresa:</label><br>
+                                <input type="text" name="username" id="username" class="form-control" placeholder="Patos INC.">
                             </div>
-
                             <div class="form-group">
-                                <label for="correo_contacto" class="text-white">Correo electrónico:</label><br>
-                                <input type="email" name="correo_contacto" id="correo_contacto" class="form-control" placeholder="empresa@ejemplo.com">
+                                <label for="rutempresa" class="text-white">Rut de la empresa:</label><br>
+                                <input type="text" name="rutempresa" id="rutempresa" class="form-control" placeholder="11111111-1 (Sin puntos y con guion)">
                             </div>
-
                             <div class="form-group">
-                                <label for="nombre" class="text-white">Nombre de la empresa:</label><br>
-                                <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Empresa S.A.">
+                                <label for="tipoempresa" class="text-white">Tipo de empresa:</label><br>
+                                <input type="text" name="tipoempresa" id="tipoempresa" class="form-control" placeholder="Tronadura">
                             </div>
-
                             <div class="form-group">
-                                <label for="razon_social" class="text-white">Razón Social:</label><br>
-                                <input type="text" name="razon_social" id="razon_social" class="form-control" placeholder="Razón Social S.A.">
+                                <label for="tipotrabajo" class="text-white">Tipo de trabajo:</label><br>
+                                <input type="text" name="tipotrabajo" id="tipotrabajo" class="form-control" placeholder="Tronadura">
                             </div>
-
                             <div class="form-group">
-                                <label for="region" class="text-white">Región:</label><br>
-                                <select name="region" id="region" class="form-control">
-                                    <!-- Opciones de regiones -->
-                                </select>
+                                <label for="servofre" class="text-white">Servicio ofrecido:</label><br>
+                                <input type="text" name="servofre" id="servofre" class="form-control" placeholder="Tronadura">
                             </div>
-                            
                             <div class="form-group">
-                                <label for="provincia" class="text-white">Provincia:</label><br>
-                                <select name="provincia" id="provincia" class="form-control">
-                                    <!-- Opciones de provincias, cargadas dinámicamente en base a la región seleccionada -->
-                                </select>
+                                <label for="numcontact" class="text-white">Número de contacto:</label><br>
+                                <input type="text" name="numcontact" id="numcontact" class="form-control" placeholder="987654321">
                             </div>
-                            
                             <div class="form-group">
-                                <label for="comuna" class="text-white">Comuna:</label><br>
-                                <select name="comuna" id="comuna" class="form-control">
-                                    <!-- Opciones de comunas, cargadas dinámicamente en base a la provincia seleccionada -->
-                                </select>
+                                <label for="email" class="text-white">Correo de contacto:</label><br>
+                                <input type="text" name="email" id="email" class="form-control" placeholder="patos@patos.cl">
                             </div>
-                            
                             <div class="form-group">
-                                <label for="direccion" class="text-white">Dirección:</label><br>
-                                <input type="text" name="direccion" id="direccion" class="form-control" placeholder="Dirección de la empresa">
+                                <label for="descripcion" class="text-white">Descripción:</label><br>
+                                <input type="text" name="descripcion" id="descripcion" class="form-control" placeholder="Somos patos y tronamos piedra">
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="tipo_empresa" class="text-white">Tipo de empresa:</label><br>
-                                <select name="tipo_empresa" id="tipo_empresa" class="form-control">
-                                    <!-- Opciones de tipos de empresa -->
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="rubros" class="text-white">Rubros de la empresa:</label><br>
-                                <select name="rubros" id="rubros" class="form-control" multiple>
-                                    <!-- Opciones de rubros, posiblemente basadas en el tipo de empresa -->
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="tamaño" class="text-white">Tamaño de la empresa:</label><br>
-                                <select name="tamaño" id="tamaño" class="form-control">
-                                    <!-- Opciones de tamaños de empresa -->
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="descripcion" class="text-white">Descripción de la empresa:</label><br>
-                                <textarea name="descripcion" id="descripcion" class="form-control" placeholder="Descripción de la empresa"></textarea>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="sitio_web" class="text-white">Sitio web (opcional):</label><br>
-                                <input type="text" name="sitio_web" id="sitio_web" class="form-control" placeholder="https://www.ejemplo.com">
-                            </div>
-
                             <div class="form-group">
                                 <label for="password" class="text-white">Contraseña:</label><br>
                                 <input type="password" name="password" id="password" class="form-control">
                             </div>
-
                             <div class="form-group">
                                 <label for="repassword" class="text-white">Repetir contraseña:</label><br>
                                 <input type="password" name="repassword" id="repassword" class="form-control">
                             </div>
-
                             <div class="form-group">
                                 <input type="submit" name="submit" class="btn btn-info btn-md" value="Registrarse">
                             </div>
-
                             <div id="login-link" class="text-right">
                                 <li><a href="{% url 'login' %}">¿Ya tienes cuenta? Inicia sesión aquí</a></li>
+                            </div>
                             </div>
                         </form>
                     </div>

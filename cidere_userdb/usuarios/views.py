@@ -1,30 +1,10 @@
 import re
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout, hashers
-from django.http import JsonResponse
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from .models import Usuario, Provincia, Comuna, Region, Rubro
-
-def cargar_regiones(request):
-    regiones = Region.objects.all().order_by('nombre')
-    return JsonResponse(list(regiones.values('id', 'nombre')), safe=False)
-
-def cargar_provincias(request):
-    region_id = request.GET.get('region_id')
-    provincias = Provincia.objects.filter(region_id=region_id).order_by('nombre')
-    return JsonResponse(list(provincias.values('id', 'nombre')), safe=False)
-
-def cargar_comunas(request):
-    provincia_id = request.GET.get('provincia_id')
-    comunas = Comuna.objects.filter(provincia_id=provincia_id).order_by('nombre')
-    return JsonResponse(list(comunas.values('id', 'nombre')), safe=False)
-
-def cargar_rubros(request):
-    rubros = Rubro.objects.all().order_by('nombre')
-    return JsonResponse(list(rubros.values('id', 'nombre')), safe=False)
-    
+from .models import Usuario  # Importa tu modelo personalizado
 
 def index(request):
     return render(request, 'index.html')
@@ -53,7 +33,7 @@ def user_login(request):
         return render(request, 'login.html')
         
 def is_valid_rut(rut):
-    rut_pattern = re.compile(r'^\d{2}\.\d{3}\.\d{3}-[\dkK]$')
+    rut_pattern = re.compile(r'^\d{1,8}-\d{1,2}$')
     return bool(rut_pattern.match(rut))
 
 def user_register(request):

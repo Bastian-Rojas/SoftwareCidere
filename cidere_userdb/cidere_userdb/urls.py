@@ -24,8 +24,4 @@ urlpatterns = [
     path('login/', views.user_login, name='login'),
     path('register/', views.user_register, name='register'),
     path('logout/', views.user_logout, name='logout'),
-    path('ajax/cargar-provincias/', views.cargar_provincias, name='ajax_cargar_provincias'),
-    path('ajax/cargar-comunas/', views.cargar_comunas, name='ajax_cargar_comunas'),
-    path('ajax/cargar-regiones/', views.cargar_regiones, name='ajax_cargar_regiones'),
-    path('ajax/cargar-rubros/', views.cargar_rubros, name='ajax_cargar_rubros'),
 ]
