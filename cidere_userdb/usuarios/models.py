@@ -44,13 +44,12 @@ class Rubro(models.Model):
     def __str__(self):
         return self.nombre
 
-# Opciones para tamaños y tipos de empresa
-TAMANO_EMPRESA_OPCIONES = [
-    ('microempresa', 'Micro Empresa'),
-    ('pequena', 'Pequeña Empresa'),
-    ('mediana', 'Mediana Empresa'),
-    ('grande', 'Gran Empresa'),
-]
+class Tamano_Empresa(models.Model):
+    nombre = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.nombre
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, rut_empresa, password=None, **extra_fields):
@@ -73,7 +72,7 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(rut_empresa, password, **extra_fields)
 
 class Usuario(AbstractBaseUser, PermissionsMixin):
-    rut_empresa = models.CharField(max_length=20, unique=True)  
+    rut_empresa = models.CharField(max_length=20, unique=True, validators=[validate_rut])  
     correo_contacto = models.EmailField(unique=True)
     nombre = models.CharField(max_length=100)
     razon_social = models.CharField(max_length=100)
@@ -83,7 +82,7 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     direccion = models.CharField(max_length=200)
     tipo_empresa = models.ForeignKey(Tipo_Empresa, on_delete=models.SET_NULL, null=True)
     rubros = models.ManyToManyField(Rubro)
-    tamano_empresa = models.CharField(max_length=50, choices=TAMANO_EMPRESA_OPCIONES)
+    tamano_empresa = models.ForeignKey(Tamano_Empresa, on_delete=models.SET_NULL, null=True)
     descripcion = models.TextField()
     sitio_web = models.URLField(blank=True, null=True)
 

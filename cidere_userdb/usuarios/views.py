@@ -5,14 +5,18 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from .models import Usuario, Provincia, Comuna, Region, Rubro
+from .models import Usuario, Provincia, Comuna, Region, Rubro, Tipo_Empresa, Tamano_Empresa
 
 def cargar_regiones(request):
-    regiones = Region.objects.all().order_by('nombre')
+    regiones = Region.objects.all().order_by('id')
+    return JsonResponse(list(regiones.values('id', 'nombre')), safe=False)
+
+def cargar_tipo_empresa(request):
+    regiones = Tipo_Empresa.objects.all().order_by('id')
     return JsonResponse(list(regiones.values('id', 'nombre')), safe=False)
 
 def cargar_provincias(request):
-    region_id = request.GET.get('region_id')
+    region_id = request.GET.get('region_id')  # Se espera que 'region_id' sea pasado como parámetro en la URL
     provincias = Provincia.objects.filter(region_id=region_id).order_by('nombre')
     return JsonResponse(list(provincias.values('id', 'nombre')), safe=False)
 
@@ -22,12 +26,46 @@ def cargar_comunas(request):
     return JsonResponse(list(comunas.values('id', 'nombre')), safe=False)
 
 def cargar_rubros(request):
-    rubros = Rubro.objects.all().order_by('nombre')
+    tipo_empresa_id = request.GET.get('tipo_empresa_id')
+    rubros = Rubro.objects.filter(tipo_empresa_id=tipo_empresa_id).order_by('nombre')
     return JsonResponse(list(rubros.values('id', 'nombre')), safe=False)
-    
+
+def cargar_tamanos_empresa(request):
+    tamanos = Tamano_Empresa.objects.all().order_by('nombre')
+    return JsonResponse(list(tamanos.values('id', 'nombre')), safe=False)
+
 
 def index(request):
     return render(request, 'index.html')
+
+def validate_rut(rut):
+    pattern = re.compile(r'^\d{2}\.\d{3}\.\d{3}-[\dkK]$')
+    if not pattern.match(rut):
+        raise ValidationError('Formato de RUT inválido. Debe ser como 77.627.982-K.')
+
+def user_login(request):
+    if request.method == 'POST':
+        rut_empresa = request.POST.get('rut_empresa')
+        password = request.POST.get('password')
+
+        if not rut_empresa or not password:
+            return render(request, 'login.html', {'error': 'RUT y contraseña son obligatorios'})
+
+        try:
+            validate_rut(rut_empresa)
+        except ValidationError:
+            return render(request, 'login.html', {'error': 'Por favor, ingrese un correo electrónico válido'})
+
+        # Intentar autenticar al usuario
+        usuario = authenticate(request, username=rut_empresa, password=password)
+        if usuario is not None:
+            login(request, usuario)
+            return redirect('index')
+        else:
+            return render(request, 'login.html', {'error': 'RUT o contraseña incorrectos'})
+
+    else:
+        return render(request, 'login.html')
 
 def user_login(request):
     if request.method == 'POST':
@@ -37,10 +75,7 @@ def user_login(request):
         if not email or not password:
             return render(request, 'login.html', {'error': 'Email y contraseña son obligatorios'})
 
-        try:
-            validate_email(email)
-        except ValidationError:
-            return render(request, 'login.html', {'error': 'Por favor, ingrese un correo electrónico válido'})
+        
 
         usuario = authenticate(request, username=email, password=password)
         if usuario is not None:
@@ -58,44 +93,62 @@ def is_valid_rut(rut):
 
 def user_register(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        rutempresa = request.POST['rutempresa']
-        tipotrabajo = request.POST['tipotrabajo']
-        tipoempresa = request.POST['tipoempresa']
-        servofre = request.POST['servofre']
-        numcontact = request.POST['numcontact']
-        email = request.POST['email']
+        rut_empresa = request.POST['rut_empresa']
+        correo_contacto = request.POST['correo_contacto']
+        nombre = request.POST['nombre']
+        razon_social = request.POST['razon_social']
+        region = request.POST['region']
+        provincia = request.POST['provincia']
+        comuna = request.POST['comuna']
+        direccion = request.POST['direccion']
+        tipo_empresa = request.POST['tipo_empresa']
+        rubros = request.POST['rubros']
+        tamano_empresa = request.POST['tamano_empresa']
         descripcion = request.POST['descripcion']
-        password = request.POST['password']
-        repassword = request.POST['repassword']
+        sitio_web = request.POST['sitio_web']
+        password = request.POST.get('password')
+        repassword = request.POST.get('repassword')
+
+        region = Region.objects.get(id=region)
+        provincia = Provincia.objects.get(id=provincia)
+        comuna = Comuna.objects.get(id=comuna)
+        tipo_empresa = Tipo_Empresa.objects.get(id=tipo_empresa)
+        tamano_empresa = Tamano_Empresa.objects.get(id=tamano_empresa)
 
         if password != repassword:
             return render(request, 'register.html', {'error': 'Las contraseñas no coinciden'})
 
         try:
-            validate_email(email)
+            validate_email(correo_contacto)
         except ValidationError:
             return render(request, 'register.html', {'error': 'Por favor, ingrese un correo electrónico válido'})
 
-        if not is_valid_rut(rutempresa):
+        if not is_valid_rut(rut_empresa):
             return render(request, 'register.html', {'error': 'Por favor, ingrese un RUT válido'})
 
-        if not numcontact.isdigit() or len(numcontact) > 9:
-            return render(request, 'register.html', {'error': 'Por favor, ingrese un número de contacto válido'})
-
         nuevo_usuario = Usuario(
-            nombre=username,
-            rut_empresa=rutempresa,
-            tipo_trabajo=tipotrabajo,
-            tipo_empresa=tipoempresa,
-            servicio_ofrecido=servofre,
-            numero_contacto=numcontact,
-            correo_contacto=email,
+            rut_empresa=rut_empresa,
+            correo_contacto=correo_contacto,
+            nombre=nombre,
+            razon_social=razon_social,
+            region=region,
+            provincia=provincia,
+            comuna=comuna,
+            direccion=direccion,
+            tipo_empresa=tipo_empresa,
+            tamano_empresa=tamano_empresa,
             descripcion=descripcion,
-            # calificacion - Asegúrate de manejar esto según tus requisitos
+            sitio_web=sitio_web
         )
         nuevo_usuario.set_password(password)  # Establece la contraseña de forma segura
         nuevo_usuario.save()
+
+        # Obtiene los IDs de rubros seleccionados y los asocia al nuevo usuario
+        rubros_seleccionados = request.POST.getlist('rubros')
+        for rubro_id in rubros_seleccionados:
+            rubro = Rubro.objects.get(id=rubro_id)
+            nuevo_usuario.rubros.add(rubro)
+
         return redirect('login')
     else:
         return render(request, 'register.html')

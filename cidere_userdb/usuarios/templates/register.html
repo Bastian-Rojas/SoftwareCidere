@@ -20,10 +20,10 @@
             margin-bottom: 15px;
         }
     </style>
-
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    
     
     <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'assets/css/fontawesome.css' %}">
@@ -47,70 +47,107 @@
         }
         return true;
     }
+    </script>
     <script>
-        $(document).ready(function(){
-            $('#region').change(function(){
-                var url = '{% url "cargar_provincias" %}';
-                var regionId = $(this).val();
-        
-                $.ajax({
-                    url: url,
-                    data: {
-                        'region': regionId
-                    },
-                    success: function (data) {
-                        $("#provincia").html(data);
-                    }
-                });
+        $(document).ready(function() {
+            // Cargar regiones cuando el documento esté listo
+            $.getJSON("{% url 'cargar_regiones' %}", function(data) {
+                var optionHTML = '<option value="">Seleccione una región</option>';
+                for (var i = 0; i < data.length; i++) {
+                    optionHTML += '<option value="' + data[i].id + '">' + data[i].nombre + '</option>';
+                }
+                $('#region').html(optionHTML);
             });
-        });
-     </script>
         
-     <script>
-            $(document).ready(function(){
-                $('#provincia').change(function(){
-                    var url = '{% url "cargar_comunas" %}';
-                    var provinciaId = $(this).val();
-            
+            // Cargar provincias cuando se selecciona una región
+            $('#region').change(function() {
+                var regionId = $(this).val(); // Obtiene el ID de la región seleccionada
+                console.log(regionId);
+                if (regionId) {
                     $.ajax({
-                        url: url,
+                        url: '{% url "cargar_provincias" %}',
                         data: {
-                            'provincia': provinciaId
+                            'region_id': regionId // Envía el ID de la región al servidor
                         },
                         success: function (data) {
-                            $("#comuna").html(data);
+                            // Actualiza el select de provincias con las nuevas opciones
+                            $('#provincia').empty().append('<option value="">Seleccione una provincia</option>');
+                            $.each(data, function(i, item) {
+                                $('#provincia').append($('<option>', {
+                                    value: item.id,
+                                    text: item.nombre
+                                }));
+                            });
                         }
                     });
-                });
+                } else {
+                    $('#provincia').empty().append('<option value="">Seleccione una provincia</option>');
+                }
             });
-        </script>
         
-        <script>
-                $(document).ready(function(){
-                    $('#comuna').change(function(){
-                        // Acciones adicionales si son necesarias
+            // Cargar comunas cuando se selecciona una provincia
+            $('#provincia').change(function() {
+                var url = "{% url 'cargar_comunas' %}" + "?provincia_id=" + $(this).val();
+                
+                $.getJSON(url, function(data) {
+                    var optionHTML = '<option value="">Seleccione una comuna</option>';
+                    data.forEach(function(comuna) {
+                        optionHTML += '<option value="' + comuna.id + '">' + comuna.nombre + '</option>';
                     });
-                });
-        </script>
-
-        <script>
-            $(document).ready(function(){
-                $('#tipoempresa').change(function(){
-                    var url = '{% url "cargar_rubros" %}';
-                    var tipoEmpresaId = $(this).val();
-            
-                    $..ajax({
-                        url: url,
-                        data: {
-                            'tipo_empresa': tipoEmpresaId
-                        },
-                        success: function (data) {
-                            $("#rubros").html(data);
-                        }
-                    });
+                    $('#comuna').html(optionHTML);
                 });
             });
-        </script>
+
+            $.getJSON("{% url 'cargar_tipo_empresa' %}", function(data) {
+                var optionHTML = '<option value="">Seleccione un tipo de empresa</option>';
+                for (var i = 0; i < data.length; i++) {
+                    optionHTML += '<option value="' + data[i].id + '">' + data[i].nombre + '</option>';
+                }
+                $('#tipo_empresa').html(optionHTML);
+            });
+
+            $('#tipo_empresa').change(function() {
+                var tipoEmpresaId = $(this).val();
+                if (tipoEmpresaId) {
+                    $.ajax({
+                        url: '/cargar-rubros/',
+                        data: {
+                            'tipo_empresa_id': tipoEmpresaId
+                        },
+                        success: function (data) {
+                            var checkboxesHTML = '';
+                            data.forEach(function(rubro) {
+                                checkboxesHTML += 
+                                    '<div class="form-check">' +
+                                        '<input class="form-check-input" type="checkbox" name="rubros" value="' + rubro.id + '" id="rubro' + rubro.id + '">' +
+                                        '<label class="form-check-label" for="rubro' + rubro.id + '">' +
+                                            rubro.nombre +
+                                        '</label>' +
+                                    '</div>';
+                            });
+                            $('#rubros-checkboxes').html(checkboxesHTML);
+                        }
+                    });
+                } else {
+                    $('#rubros-checkboxes').empty();
+                }
+            });
+
+            // Cargar tamaños de empresa cuando el documento esté listo
+            $.getJSON("{% url 'cargar_tamanos_empresa' %}", function(data) {
+                var optionHTML = '<option value="">Seleccione un tamaño</option>';
+                for (var i = 0; i < data.length; i++) {
+                    optionHTML += '<option value="' + data[i].id + '">' + data[i].nombre + '</option>';
+                }
+                $('#tamano_empresa').html(optionHTML);
+            });
+
+        });
+
+        // Cargar tipos cuando el documento esté listo
+    </script>
+    
+
 
 </head>
 <body>
@@ -180,16 +217,16 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="rubros" class="text-white">Rubros de la empresa:</label><br>
-                                <select name="rubros" id="rubros" class="form-control" multiple>
-                                    <!-- Opciones de rubros, posiblemente basadas en el tipo de empresa -->
-                                </select>
+                                <label for="rubros" class="text-white" >Rubros de la empresa:</label><br>
+                                <div id="rubros-checkboxes">
+                                    <!-- Los checkboxes de rubros se cargarán aquí -->
+                                </div>
                             </div>
                             
                             <div class="form-group">
-                                <label for="tamaño" class="text-white">Tamaño de la empresa:</label><br>
-                                <select name="tamaño" id="tamaño" class="form-control">
-                                    <!-- Opciones de tamaños de empresa -->
+                                <label for="tamano_empresa" class="text-white">Tamaño de la empresa:</label><br>
+                                <select name="tamano_empresa" id="tamano_empresa" class="form-control">
+                                    <!-- Las opciones se cargarán dinámicamente por JavaScript -->
                                 </select>
                             </div>
                             
