@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados de Búsqueda</title>
+    <!-- Añade aquí cualquier enlace a hojas de estilo CSS o archivos JavaScript necesarios -->
+</head>
+<body>
+    <h1>Resultados de Búsqueda</h1>
+    {% if servicios %}
+        <ul>
+            {% for servicio in servicios %}
+                <li>
+                    <h2>{{ servicio.nombre }}</h2>
+                    <p>{{ servicio.descripcion }}</p>
+                    <p><strong>RUT de la Empresa:</strong> {{ servicio.rut_empresa }}</p>
+                    <p><strong>Correo de Contacto:</strong> {{ servicio.correo_contacto }}</p>
+                    <p><strong>Dirección:</strong> {{ servicio.direccion }}</p>
+                    <p><strong>Rubros:</strong> {% for rubro in servicio.rubros.all %}{{ rubro.nombre }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+                    <p><strong>Tamaño de la Empresa:</strong> {{ servicio.get_tamano_empresa_display }}</p>
+                    {% if servicio.sitio_web %}
+                        <p><a href="{{ servicio.sitio_web }}" target="_blank">Visitar Sitio Web</a></p>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron servicios para este rubro.</p>
+    {% endif %}
+</body>
+</html>
+
+

@@ -101,3 +101,11 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     class Meta:
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
+        
+class Servicio(models.Model):
+    nombre = models.CharField(max_length=100)
+    calificacion = models.IntegerField()
+    tipo_empresa = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.nombre

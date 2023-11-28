@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from .models import Usuario, Provincia, Comuna, Region, Rubro, Tipo_Empresa, Tamano_Empresa
+from .models import Usuario, Provincia, Comuna, Region, Rubro, Tipo_Empresa, Tamano_Empresa, Servicio
 
 def cargar_regiones(request):
     regiones = Region.objects.all().order_by('id')
@@ -157,3 +157,20 @@ def user_logout(request):
     logout(request)
     messages.success(request, "Has cerrado sesión exitosamente.")
     return redirect('index')
+
+def resultado_busqueda(request):
+    query = request.GET.get('query', '')
+
+    if query:
+        palabras_busqueda = query.split()  # Divide la consulta en palabras individuales
+        queryset = Usuario.objects.all()
+
+        # Filtra los usuarios cuyos rubros o nombre coincidan con alguna de las palabras de la consulta
+        for palabra in palabras_busqueda:
+            queryset = queryset.filter(rubros__nombre__icontains=palabra) | queryset.filter(nombre__icontains=palabra)
+
+        servicios = queryset.distinct()
+    else:
+        servicios = Usuario.objects.none()
+
+    return render(request, 'resultados_busqueda.html', {'servicios': servicios, 'query': query})
