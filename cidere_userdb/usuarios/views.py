@@ -54,7 +54,7 @@ def user_login(request):
         try:
             validate_rut(rut_empresa)
         except ValidationError:
-            return render(request, 'login.html', {'error': 'Por favor, ingrese un correo electrónico válido'})
+            return render(request, 'login.html', {'error': 'Por favor, ingrese un RUT válido'})
 
         # Intentar autenticar al usuario
         usuario = authenticate(request, username=rut_empresa, password=password)
@@ -67,25 +67,6 @@ def user_login(request):
     else:
         return render(request, 'login.html')
 
-def user_login(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-
-        if not email or not password:
-            return render(request, 'login.html', {'error': 'Email y contraseña son obligatorios'})
-
-        
-
-        usuario = authenticate(request, username=email, password=password)
-        if usuario is not None:
-            login(request, usuario)
-            return redirect('index')
-        else:
-            return render(request, 'login.html', {'error': 'Email o contraseña incorrecta'})
-
-    else:
-        return render(request, 'login.html')
         
 def is_valid_rut(rut):
     rut_pattern = re.compile(r'^\d{2}\.\d{3}\.\d{3}-[\dkK]$')
@@ -149,14 +130,15 @@ def user_register(request):
             rubro = Rubro.objects.get(id=rubro_id)
             nuevo_usuario.rubros.add(rubro)
 
-        return redirect('login')
+        return redirect('index')
     else:
         return render(request, 'register.html')
 
 def user_logout(request):
+    print('ola xd')
     logout(request)
     messages.success(request, "Has cerrado sesión exitosamente.")
-    return redirect('index')
+    return redirect('login')
 
 def resultado_busqueda(request):
 
