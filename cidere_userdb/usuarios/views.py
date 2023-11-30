@@ -159,17 +159,21 @@ def user_logout(request):
     return redirect('index')
 
 def resultado_busqueda(request):
+
     query = request.GET.get('query', '')
+    print(f"Consulta recibida: '{query}'")  # Depuración
 
     if query:
-        palabras_busqueda = query.split()  # Divide la consulta en palabras individuales
+        palabras_busqueda = query.split()
         queryset = Usuario.objects.all()
+        print(f"Usuarios antes de filtrar: {queryset.count()}")  # Depuración
 
-        # Filtra los usuarios cuyos rubros o nombre coincidan con alguna de las palabras de la consulta
         for palabra in palabras_busqueda:
             queryset = queryset.filter(rubros__nombre__icontains=palabra) | queryset.filter(nombre__icontains=palabra)
+            print(f"Usuarios después de filtrar por '{palabra}': {queryset.count()}")  # Depuración
 
         servicios = queryset.distinct()
+        print(f"Servicios encontrados: {servicios.count()}")  # Depuración
     else:
         servicios = Usuario.objects.none()
 
