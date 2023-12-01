@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    {% load static %}
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700,800,900" rel="stylesheet">
+    <title>Mercado Cidere Register</title>
+    <style>
+        body {
+            background-image: url("{% static 'images/camioncitos.png' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+        .error {
+            color: red;
+            margin-bottom: 15px;
+        }
+    </style>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    
+    
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'assets/css/fontawesome.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/templatemo-mercado-cidere.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/owl.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/lightbox.css' %}">
+    
+    <script>
+    function validateForm() {
+        var rut_empresa = document.getElementById('rut_empresa').value;
+        var email = document.getElementById('email').value;
+        var password = document.getElementById('password').value;
+        var repassword = document.getElementById('repassword').value;
+        if (rut_empresa == "" || email == "" || password == "" || repassword == "") {
+            alert("Todos los campos son obligatorios");
+            return false;
+        }
+        if (password != repassword) {
+            alert("Las contraseñas no coinciden");
+            return false;
+        }
+        return true;
+    }
+    </script>
+    <script>
+        $(document).ready(function() {
+            // Cargar regiones cuando el documento esté listo
+            $.getJSON("{% url 'cargar_regiones' %}", function(data) {
+                var optionHTML = '<option value="">Seleccione una región</option>';
+                for (var i = 0; i < data.length; i++) {
+                    optionHTML += '<option value="' + data[i].id + '">' + data[i].nombre + '</option>';
+                }
+                $('#region').html(optionHTML);
+            });
+        
+            // Cargar provincias cuando se selecciona una región
+            $('#region').change(function() {
+                var regionId = $(this).val(); // Obtiene el ID de la región seleccionada
+                console.log(regionId);
+                if (regionId) {
+                    $.ajax({
+                        url: '{% url "cargar_provincias" %}',
+                        data: {
+                            'region_id': regionId // Envía el ID de la región al servidor
+                        },
+                        success: function (data) {
+                            // Actualiza el select de provincias con las nuevas opciones
+                            $('#provincia').empty().append('<option value="">Seleccione una provincia</option>');
+                            $.each(data, function(i, item) {
+                                $('#provincia').append($('<option>', {
+                                    value: item.id,
+                                    text: item.nombre
+                                }));
+                            });
+                        }
+                    });
+                } else {
+                    $('#provincia').empty().append('<option value="">Seleccione una provincia</option>');
+                }
+            });
+        
+            // Cargar comunas cuando se selecciona una provincia
+            $('#provincia').change(function() {
+                var url = "{% url 'cargar_comunas' %}" + "?provincia_id=" + $(this).val();
+                
+                $.getJSON(url, function(data) {
+                    var optionHTML = '<option value="">Seleccione una comuna</option>';
+                    data.forEach(function(comuna) {
+                        optionHTML += '<option value="' + comuna.id + '">' + comuna.nombre + '</option>';
+                    });
+                    $('#comuna').html(optionHTML);
+                });
+            });
+
+            $.getJSON("{% url 'cargar_tipo_empresa' %}", function(data) {
+                var optionHTML = '<option value="">Seleccione un tipo de empresa</option>';
+                for (var i = 0; i < data.length; i++) {
+                    optionHTML += '<option value="' + data[i].id + '">' + data[i].nombre + '</option>';
+                }
+                $('#tipo_empresa').html(optionHTML);
+            });
+
+            $('#tipo_empresa').change(function() {
+                var tipoEmpresaId = $(this).val();
+                if (tipoEmpresaId) {
+                    $.ajax({
+                        url: '/cargar-rubros/',
+                        data: {
+                            'tipo_empresa_id': tipoEmpresaId
+                        },
+                        success: function (data) {
+                            var checkboxesHTML = '';
+                            data.forEach(function(rubro) {
+                                checkboxesHTML += 
+                                    '<div class="form-check">' +
+                                        '<input class="form-check-input" type="checkbox" name="rubros" value="' + rubro.id + '" id="rubro' + rubro.id + '">' +
+                                        '<label class="form-check-label" for="rubro' + rubro.id + '">' +
+                                            rubro.nombre +
+                                        '</label>' +
+                                    '</div>';
+                            });
+                            $('#rubros-checkboxes').html(checkboxesHTML);
+                        }
+                    });
+                } else {
+                    $('#rubros-checkboxes').empty();
+                }
+            });
+
+            // Cargar tamaños de empresa cuando el documento esté listo
+            $.getJSON("{% url 'cargar_tamanos_empresa' %}", function(data) {
+                var optionHTML = '<option value="">Seleccione un tamaño</option>';
+                for (var i = 0; i < data.length; i++) {
+                    optionHTML += '<option value="' + data[i].id + '">' + data[i].nombre + '</option>';
+                }
+                $('#tamano_empresa').html(optionHTML);
+            });
+
+        });
+
+        // Cargar tipos cuando el documento esté listo
+    </script>
+    
+
+
+</head>
+<body>
+    <div id="register">
+        <div class="container">
+            <div id="register-row" class="row justify-content-center align-items-center">
+                <div id="register-column" class="col-md-6">
+                    <div id="register-box" class="col-md-12">
+                        <form id="register-form" class="form" action="{% url 'register' %}" method="post" onsubmit="return validateForm()">
+                            {% csrf_token %}
+                            {% if error %}
+                                <div class="error">{{ error }}</div>
+                            {% endif %}
+                            <h3 class="text-center text-white pt-5">Registro</h3>
+
+                            <div class="form-group">
+                                <label for="rut_empresa" class="text-white">RUT de la empresa:</label><br>
+                                <input type="text" name="rut_empresa" id="rut_empresa" class="form-control" placeholder="77.777.777-7">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="correo_contacto" class="text-white">Correo electrónico:</label><br>
+                                <input type="email" name="correo_contacto" id="correo_contacto" class="form-control" placeholder="empresa@ejemplo.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="nombre" class="text-white">Nombre de la empresa:</label><br>
+                                <input type="text" name="nombre" id="nombre" class="form-control" placeholder="Empresa S.A.">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="razon_social" class="text-white">Razón Social:</label><br>
+                                <input type="text" name="razon_social" id="razon_social" class="form-control" placeholder="Razón Social S.A.">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="region" class="text-white">Región:</label><br>
+                                <select name="region" id="region" class="form-control">
+                                    <!-- Opciones de regiones -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="provincia" class="text-white">Provincia:</label><br>
+                                <select name="provincia" id="provincia" class="form-control">
+                                    <!-- Opciones de provincias, cargadas dinámicamente en base a la región seleccionada -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="comuna" class="text-white">Comuna:</label><br>
+                                <select name="comuna" id="comuna" class="form-control">
+                                    <!-- Opciones de comunas, cargadas dinámicamente en base a la provincia seleccionada -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="direccion" class="text-white">Dirección:</label><br>
+                                <input type="text" name="direccion" id="direccion" class="form-control" placeholder="Dirección de la empresa">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tipo_empresa" class="text-white">Tipo de empresa:</label><br>
+                                <select name="tipo_empresa" id="tipo_empresa" class="form-control">
+                                    <!-- Opciones de tipos de empresa -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="rubros" class="text-white">Rubros de la empresa:</label><br>
+                                <div id="rubros-checkboxes">
+                                    <!-- Los checkboxes de rubros se cargarán aquí -->
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="tamano_empresa" class="text-white">Tamaño de la empresa:</label><br>
+                                <select name="tamano_empresa" id="tamano_empresa" class="form-control">
+                                    <!-- Las opciones se cargarán dinámicamente por JavaScript -->
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="descripcion" class="text-white">Descripción de la empresa:</label><br>
+                                <textarea name="descripcion" id="descripcion" class="form-control" placeholder="Descripción de la empresa"></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="sitio_web" class="text-white">Sitio web (opcional):</label><br>
+                                <input type="text" name="sitio_web" id="sitio_web" class="form-control" placeholder="https://www.ejemplo.com">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="password" class="text-white">Contraseña:</label><br>
+                                <input type="password" name="password" id="password" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="repassword" class="text-white">Repetir contraseña:</label><br>
+                                <input type="password" name="repassword" id="repassword" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <input type="submit" name="submit" class="btn btn-info btn-md" value="Registrarse">
+                            </div>
+
+                            <div id="login-link" class="text-right">
+                                <li><a href="{% url 'login' %}">¿Ya tienes cuenta? Inicia sesión aquí</a></li>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
