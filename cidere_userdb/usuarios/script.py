@@ -1,18 +1,12 @@
 from django.shortcuts import render
-from .models import Servicio
+from .models import Servicio, Usuario
 
 def servicios(request):
-    servicios_list = Servicio.objects.all()
-
     # Obtener parámetros de la URL
     search_query = request.GET.get('search', '')
-    order_by = request.GET.get('order_by', '')
 
-    # Aplicar filtros y ordenación
-    if search_query:
-        servicios_list = servicios_list.filter(nombre__icontains=search_query)
+    # Filtrar servicios según la búsqueda
+    resultados = Usuario.objects.filter(nombre__icontains=search_query)
 
-    if order_by:
-        servicios_list = servicios_list.order_by(order_by)
-
-    return render(request, 'servicios.html', {'servicios': servicios_list})
+    # Renderizar la página de resultados de búsqueda
+    return render(request, 'resultados_busqueda.html', {'servicios': resultados, 'query': search_query})

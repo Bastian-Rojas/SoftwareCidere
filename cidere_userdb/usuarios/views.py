@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from .models import Usuario, Provincia, Comuna, Region, Rubro, Tipo_Empresa, Tamano_Empresa, Servicio
+from django.db.models import Q
 
 def cargar_regiones(request):
     regiones = Region.objects.all().order_by('id')
@@ -141,22 +142,22 @@ def user_logout(request):
     return redirect('login')
 
 def resultado_busqueda(request):
-
-    query = request.GET.get('query', '')
-    print(f"Consulta recibida: '{query}'")  # Depuración
+    if request.method == 'POST':
+        query = request.POST.get('query', '')  # Se espera que 'query' sea pasado como parámetro en la URL
+        print(f"Consulta recibida: '{query}'")  # Depuración
 
     if query:
-        palabras_busqueda = query.split()
+        palabras_busqueda = query.split(" ")
         queryset = Usuario.objects.all()
         print(f"Usuarios antes de filtrar: {queryset.count()}")  # Depuración
 
         for palabra in palabras_busqueda:
-            queryset = queryset.filter(rubros__nombre__icontains=palabra) | queryset.filter(nombre__icontains=palabra)
+            queryset = queryset.filter(nombre__icontains=palabra) | queryset.filter(Q(tipo_empresa__nombre__icontains=palabra)) | queryset.filter(Q(rubros__nombre__icontains=palabra))
             print(f"Usuarios después de filtrar por '{palabra}': {queryset.count()}")  # Depuración
 
-        servicios = queryset.distinct()
-        print(f"Servicios encontrados: {servicios.count()}")  # Depuración
+        usuarios = queryset.distinct()
+        print(f"Usuarios encontrados: {usuarios.count()}")  # Depuración
     else:
-        servicios = Usuario.objects.none()
+        usuarios = Usuario.objects.none()
 
-    return render(request, 'resultados_busqueda.html', {'servicios': servicios, 'query': query})
+    return render(request, 'resultados_busqueda.html', {'usuarios': usuarios, 'query': query})
