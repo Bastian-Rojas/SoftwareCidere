@@ -163,3 +163,5 @@ def resultado_busqueda(request):
 
 def cargar_encuestas(request):
     return render(request, 'encuestas.html')
+
+        

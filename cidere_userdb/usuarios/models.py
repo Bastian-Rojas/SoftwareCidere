@@ -102,10 +102,33 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
         
+class Proveedor(models.Model):
+    proveedores = models.PositiveIntegerField(default=0)
+    def __str__(self):
+      return self.proveedores
+
 class Servicio(models.Model):
-    nombre = models.CharField(max_length=100)
-    calificacion = models.IntegerField()
-    tipo_empresa = models.CharField(max_length=50)
+    servicios = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return self.nombre
+        return self.servicios
+    
+class Calificacion(models.Model):
+    calificacion = models.PositiveIntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
+    def __str__(self):
+        return self.calificacion
+    
+class InteraccionEmpresa(models.Model):
+    fecha = models.DateField(primary_key=True);
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    proveedores = models.PositiveIntegerField(default=0)
+    servicios = models.PositiveIntegerField(default=0)
+    calificacion = models.PositiveIntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
+
+    def __str__(self):
+        return f"Fecha: {self.fecha} - Usuario: {self.usuario.nombre} - Proveedores: {self.proveedores} - Servicios: {self.servicios} - Calificación: {self.calificacion}"
+    class Meta:
+     verbose_name = 'Interacción de Empresa'
+     verbose_name_plural = 'Interacciones de Empresas'
+    
+

@@ -66,6 +66,8 @@
         .star.selected ~ .star {
             color: orange;
         }
+
+
         .listTerms{
             display: flex;
             flex-direction: column;
@@ -95,33 +97,74 @@
     <div class="container">
         <div class="content">
             <h1 class="titleForm">Formulario de Calificación</h1>
-           
-            <div id="Encuesta">
+
+            <div id="encuestaForm">
                 <div class="form-group">
                     <h3 class="subtitle">¿Cuántos provedores se han contactado con su empresa, en los ultimos 6 meses?</h3>
-                    <input class="place" type="text" name="contProve" id="contProve" class="form-control" placeholder="Porfavor, Ingrese números" required>
+                    <input class="place" type="text" name="contProve" id="contProve" class="form-control" placeholder="Porfavor, Ingrese números">
                 </div>
         
                 <div class="form-group">
                     <h3 class="subtitle">¿Cuántos servicios se han brindado su empresa, en los ultimos 6 meses?</h3>
-                    <input class="place" type="text" name="contProve" id="contProve" class="form-control" placeholder="Porfavor, Ingrese números" required>
+                    <input class="place" type="text" name="contServ" id="contServ" class="form-control" placeholder="Porfavor, Ingrese números">
                 </div>
-        
-               <div class="adjunto-licitacion">
+            <!--  
+             <div class="adjunto-licitacion">
                 <h3 class="subtitle">Adjuntar PDF:</h3>
                 <input type="file" id="pdf" name="pdf" accept=".pdf" required>
                </div>
+               -->
                <h3 class="subtitle">¿Porfavor, Ingrese la calificación que le daria al sitio?</h3>
-               
                <div class="stars">
-                    <form class="stard" method="post" enctype="multipart/form-data">
-                        <span class="star" onclick="//setRating(1)">★</span>
-                        <span class="star" onclick="//setRating(2)">★</span>
-                        <span class="star" onclick="//setRating(3)">★</span>
-                        <span class="star" onclick="//setRating(4)">★</span>
-                        <span class="star" onclick="//setRating(5)">★</span>
+                    <form class="stard" id="stard" method="post" enctype="multipart/form-data">
+                        <span class="star" data-value="5">★</span>
+                        <span class="star" data-value="4">★</span>
+                        <span class="star" data-value="3">★</span>
+                        <span class="star" data-value="2">★</span>
+                        <span class="star" data-value="1">★</span>
                        
                     </form>
+                    <script>
+                        document.addEventListener("DOMContentLoaded", function () {
+                            const stars = document.querySelectorAll(".star");
+                            const ratingInput = document.getElementById("rating");
+                    
+                            // Función para manejar la selección de estrellas
+                            function handleStarSelection(event) {
+                                const selectedValue = parseInt(event.target.getAttribute("data-value"));
+                                ratingInput.value = selectedValue; // Actualiza el valor del input hidden
+                    
+                                stars.forEach(star => {
+                                    const value = parseInt(star.getAttribute("data-value"));
+                                    if (value <= selectedValue) {
+                                        star.classList.add("selected");
+                                    } else {
+                                        star.classList.remove("selected");
+                                    }
+                                });
+                            }
+                    
+                            // Añadir evento clic a cada estrella
+                            stars.forEach(star => {
+                                star.addEventListener("click", handleStarSelection);
+                            });
+                    
+                            // Cuando se carga la página, verifica si hay una calificación preseleccionada
+                            const preselectedRating = parseInt(document.querySelector(".stars").getAttribute("data-rating"));
+                            if (preselectedRating > 0) {
+                                ratingInput.value = preselectedRating; // Actualiza el valor del input hidden
+                    
+                                stars.forEach(star => {
+                                    const value = parseInt(star.getAttribute("data-value"));
+                                    if (value <= preselectedRating) {
+                                        star.classList.add("selected");
+                                    } else {
+                                        star.classList.remove("selected");
+                                    }
+                                });
+                            }
+                        });
+                    </script>
                 </div>
         
                 <div class="terminosycondiciones">
@@ -134,13 +177,13 @@
                         </div>
                             <div class="confirmation">
                                 <h4>Acepto los términos y condiciones.</h4>
-                                <input class="check" type="checkbox" id="terminos" name="terminos" required> 
+                                <input class="check" type="checkbox" id="terminos" name="terminos"> 
                             </div>                        
                     </div>
                 <div class="button">
-                    <input type="hidden" name="rating" id="rating" value="0">
-                    <button class="bsubmit" type="submit">Enviar Calificación</button>
+                    <button class="bsubmit">Enviar Calificación</button>
                 </div>
+            </div>
             </div>
         </div>
        

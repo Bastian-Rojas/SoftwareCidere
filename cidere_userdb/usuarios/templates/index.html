@@ -237,8 +237,15 @@
             <div class="top-content">
               <h6>Licitaciones Espacio Industrial Minero</h6>
             </div>
+            {% if request.user.is_authenticated %}
             <form id="contact" action="" method="get">
               <div class="main-button"><a rel="nofollow" href="encuestas" target="_parent">Licitaciones</a></div>
+            {% else %}
+              <div class="top-content">
+                <div class="error">{{ error }}<h6>Debe iniciar sesión para agregar licitaciones</h6></div>              
+              </div>
+  
+            {% endif %}
                   </fieldset>
                 </div>
               </div>
