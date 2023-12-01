@@ -98,24 +98,22 @@
         <div class="content">
             <h1 class="titleForm">Formulario de Calificación</h1>
 
-            <div id="encuestaForm">
+            <form id="encuestaForm" action="{% url 'encuestas' %}" method="POST">
+                {% csrf_token %}
+
                 <div class="form-group">
-                    <h3 class="subtitle">¿Cuántos provedores se han contactado con su empresa, en los ultimos 6 meses?</h3>
-                    <input class="place" type="text" name="contProve" id="contProve" class="form-control" placeholder="Porfavor, Ingrese números">
+                    <h3 class="subtitle">¿Cuántos proveedores se han contactado con su empresa en los últimos 6 meses?</h3>
+                    <input class="place" type="text" name="contProve" id="contProve" class="form-control" placeholder="Por favor, ingrese números">
                 </div>
         
                 <div class="form-group">
-                    <h3 class="subtitle">¿Cuántos servicios se han brindado su empresa, en los ultimos 6 meses?</h3>
-                    <input class="place" type="text" name="contServ" id="contServ" class="form-control" placeholder="Porfavor, Ingrese números">
+                    <h3 class="subtitle">¿Cuántos servicios se han brindado su empresa en los últimos 6 meses?</h3>
+                    <input class="place" type="text" name="contServ" id="contServ" class="form-control" placeholder="Por favor, ingrese números">
                 </div>
-            <!--  
-             <div class="adjunto-licitacion">
-                <h3 class="subtitle">Adjuntar PDF:</h3>
-                <input type="file" id="pdf" name="pdf" accept=".pdf" required>
-               </div>
-               -->
-               <h3 class="subtitle">¿Porfavor, Ingrese la calificación que le daria al sitio?</h3>
-               <div class="stars">
+
+                <h3 class="subtitle">Por favor, ingrese la calificación que le daría al sitio</h3>
+                <input type="hidden" name="rating" id="rating" value="0">
+                <div class="stars">
                     <form class="stard" id="stard" method="post" enctype="multipart/form-data">
                         <span class="star" data-value="5">★</span>
                         <span class="star" data-value="4">★</span>
@@ -124,70 +122,65 @@
                         <span class="star" data-value="1">★</span>
                        
                     </form>
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function () {
-                            const stars = document.querySelectorAll(".star");
-                            const ratingInput = document.getElementById("rating");
-                    
-                            // Función para manejar la selección de estrellas
-                            function handleStarSelection(event) {
-                                const selectedValue = parseInt(event.target.getAttribute("data-value"));
-                                ratingInput.value = selectedValue; // Actualiza el valor del input hidden
-                    
-                                stars.forEach(star => {
-                                    const value = parseInt(star.getAttribute("data-value"));
-                                    if (value <= selectedValue) {
-                                        star.classList.add("selected");
-                                    } else {
-                                        star.classList.remove("selected");
-                                    }
-                                });
-                            }
-                    
-                            // Añadir evento clic a cada estrella
-                            stars.forEach(star => {
-                                star.addEventListener("click", handleStarSelection);
-                            });
-                    
-                            // Cuando se carga la página, verifica si hay una calificación preseleccionada
-                            const preselectedRating = parseInt(document.querySelector(".stars").getAttribute("data-rating"));
-                            if (preselectedRating > 0) {
-                                ratingInput.value = preselectedRating; // Actualiza el valor del input hidden
-                    
-                                stars.forEach(star => {
-                                    const value = parseInt(star.getAttribute("data-value"));
-                                    if (value <= preselectedRating) {
-                                        star.classList.add("selected");
-                                    } else {
-                                        star.classList.remove("selected");
-                                    }
-                                });
-                            }
-                        });
-                    </script>
                 </div>
         
                 <div class="terminosycondiciones">
-                   <h4 class="terms">Terminos y Condiciones.</h4>
-                        <div class="listTerms">
-                            <span>1.La Información general, uso bajo su responsabilidad.</span>
-                            <span>2.Todo el contenido del sitio es propiedad de CIDERE.</span>
-                            <span>3.No nos responsabilizamos por sitios enlazados.</span>
-                            <span>4.Nos reservamos el derecho de cambiar los términos.</span>
-                        </div>
-                            <div class="confirmation">
-                                <h4>Acepto los términos y condiciones.</h4>
-                                <input class="check" type="checkbox" id="terminos" name="terminos"> 
-                            </div>                        
+                    <h4 class="terms">Términos y Condiciones.</h4>
+                    <div class="listTerms">
+                        <span>1.La Información general, uso bajo su responsabilidad.</span>
+                        <span>2.Todo el contenido del sitio es propiedad de CIDERE.</span>
+                        <span>3.No nos responsabilizamos por sitios enlazados.</span>
+                        <span>4.Nos reservamos el derecho de cambiar los términos.</span>
                     </div>
-                <div class="button">
-                    <button class="bsubmit">Enviar Calificación</button>
+                    <div class="confirmation">
+                        <h4>Acepto los términos y condiciones.</h4>
+                        <input class="check" type="checkbox" id="terminos" name="terminos"> 
+                    </div>                        
                 </div>
-            </div>
-            </div>
+                
+                <div class="button">
+                    <button class="bsubmit" type="submit">Enviar Calificación</button>
+                </div>
+            </form>
         </div>
-       
     </div>
-   
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const stars = document.querySelectorAll(".star");
+            const ratingInput = document.getElementById("rating");
+    
+            function handleStarSelection(event) {
+                const selectedValue = parseInt(event.target.getAttribute("data-value"));
+                ratingInput.value = selectedValue;
+    
+                stars.forEach(star => {
+                    const value = parseInt(star.getAttribute("data-value"));
+                    if (value <= selectedValue) {
+                        star.classList.add("selected");
+                    } else {
+                        star.classList.remove("selected");
+                    }
+                });
+            }
+    
+            stars.forEach(star => {
+                star.addEventListener("click", handleStarSelection);
+            });
+    
+            const preselectedRating = parseInt(document.querySelector(".stars").getAttribute("data-rating"));
+            if (preselectedRating > 0) {
+                ratingInput.value = preselectedRating;
+    
+                stars.forEach(star => {
+                    const value = parseInt(star.getAttribute("data-value"));
+                    if (value <= preselectedRating) {
+                        star.classList.add("selected");
+                    } else {
+                        star.classList.remove("selected");
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

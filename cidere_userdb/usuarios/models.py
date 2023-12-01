@@ -113,22 +113,17 @@ class Servicio(models.Model):
     def __str__(self):
         return self.servicios
     
-class Calificacion(models.Model):
-    calificacion = models.PositiveIntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
-    def __str__(self):
-        return self.calificacion
-    
-class InteraccionEmpresa(models.Model):
-    fecha = models.DateField(primary_key=True);
+class Encuesta(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    proveedores = models.PositiveIntegerField(default=0)
-    servicios = models.PositiveIntegerField(default=0)
-    calificacion = models.PositiveIntegerField(choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])
+    cont_proveedores = models.PositiveIntegerField()
+    cont_servicios = models.PositiveIntegerField()
+    calificacion_sitio = models.PositiveIntegerField()
+    terminos_y_condiciones = models.BooleanField()
+    fecha_registro = models.DateTimeField(auto_now_add=True)
 
+    # Aquí puedes agregar relaciones con otros modelos si es necesario
+    
     def __str__(self):
-        return f"Fecha: {self.fecha} - Usuario: {self.usuario.nombre} - Proveedores: {self.proveedores} - Servicios: {self.servicios} - Calificación: {self.calificacion}"
-    class Meta:
-     verbose_name = 'Interacción de Empresa'
-     verbose_name_plural = 'Interacciones de Empresas'
+        return f"Encuesta - {self.fecha_registro}"
     
 

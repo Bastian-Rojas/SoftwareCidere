@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Usuario,Region, Provincia, Comuna, Rubro, Tipo_Empresa, Tamano_Empresa
+from .models import Usuario,Region, Provincia, Comuna, Rubro, Tipo_Empresa, Tamano_Empresa, Encuesta
 
 admin.site.register(Usuario)
 admin.site.register(Region)
@@ -8,3 +8,4 @@ admin.site.register(Comuna)
 admin.site.register(Rubro)
 admin.site.register(Tipo_Empresa)
 admin.site.register(Tamano_Empresa)
+admin.site.register(Encuesta)
