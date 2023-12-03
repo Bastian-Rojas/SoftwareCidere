@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resultados de Búsqueda</title>
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700,800,900"
+      rel="stylesheet"
+    />
+    <link href="/static/assets/css/login.css" rel="stylesheet" />
+    <link href="/static/assets/css/busqueda.css" rel="stylesheet" />
+    <title>Mercado Cidere Login</title>
+    {% load static %}
+    <link href="{% static 'assets/css/styles.css' %}" rel="stylesheet" />
+    <link
+      href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
+      rel="stylesheet"
+      id="bootstrap-css"
+    />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+
+    <link
+      href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="{% static 'assets/css/fontawesome.css' %}" />
+    <link
+      rel="stylesheet"
+      href="{% static 'assets/css/templatemo-mercado-cidere.css' %}"
+    />
+    <link rel="stylesheet" href="{% static 'assets/css/owl.css' %}" />
+    <link rel="stylesheet" href="{% static 'assets/css/lightbox.css' %}" />
+  </head>
+  <body>
+    <div class="constainer">
+      <div class="content">
+        <h1 class="tituloBusqueda">Resultados de búsqueda para "{{ query }}"</h1>
+        <div class="resultados">
+            {% if usuarios %}
+            <ul class="listaresultados">
+              {% for usuario in usuarios %}
+              <li class="resultadoBusqueda" >
+                <h3 class="resultadoNombre" >{{ usuario.nombre }}</h3>
+                <hr class="separador"/>
+                <p class="resultadoTipoEmpresa">Tipo de empresa: {{ usuario.tipo_empresa.nombre }}</p>
+                <p class="resultadoRubro">Rubros:
+                    {% for rubro in usuario.rubros.all %}
+                        {{ rubro.nombre }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </p>
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            <p class="noResultados">No se encontraron resultados para "{{ query }}".</p>
+            {% endif %}
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
