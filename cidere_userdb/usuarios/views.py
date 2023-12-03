@@ -5,7 +5,8 @@ from django.http import JsonResponse
 from django.contrib import messages
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
-from .models import Usuario, Provincia, Comuna, Region, Rubro, Tipo_Empresa, Tamano_Empresa, Servicio
+from .models import Usuario, Provincia, Comuna, Region, Rubro, Tipo_Empresa, Tamano_Empresa, Servicio, Encuesta
+from django.db.models import Q
 
 def cargar_regiones(request):
     regiones = Region.objects.all().order_by('id')
@@ -135,28 +136,54 @@ def user_register(request):
         return render(request, 'register.html')
 
 def user_logout(request):
-    print('ola xd')
     logout(request)
     messages.success(request, "Has cerrado sesión exitosamente.")
-    return redirect('login')
+    return redirect('index')
 
 def resultado_busqueda(request):
-
-    query = request.GET.get('query', '')
-    print(f"Consulta recibida: '{query}'")  # Depuración
+    if request.method == 'POST':
+        query = request.POST.get('query', '')  # Se espera que 'query' sea pasado como parámetro en la URL
+        print(f"Consulta recibida: '{query}'")  # Depuración
 
     if query:
-        palabras_busqueda = query.split()
+        palabras_busqueda = query.split(" ")
         queryset = Usuario.objects.all()
         print(f"Usuarios antes de filtrar: {queryset.count()}")  # Depuración
 
         for palabra in palabras_busqueda:
-            queryset = queryset.filter(rubros__nombre__icontains=palabra) | queryset.filter(nombre__icontains=palabra)
+            queryset = queryset.filter(nombre__icontains=palabra) | queryset.filter(Q(tipo_empresa__nombre__icontains=palabra)) | queryset.filter(Q(rubros__nombre__icontains=palabra))
             print(f"Usuarios después de filtrar por '{palabra}': {queryset.count()}")  # Depuración
 
-        servicios = queryset.distinct()
-        print(f"Servicios encontrados: {servicios.count()}")  # Depuración
+        usuarios = queryset.distinct()
+        print(f"Usuarios encontrados: {usuarios.count()}")  # Depuración
     else:
-        servicios = Usuario.objects.none()
+        usuarios = Usuario.objects.none()
 
-    return render(request, 'resultados_busqueda.html', {'servicios': servicios, 'query': query})
+    return render(request, 'resultados_busqueda.html', {'usuarios': usuarios, 'query': query})
+
+def cargar_encuestas(request):
+    if request.method == 'POST':
+        print('test2')
+        cont_proveedores = request.POST.get('contProve', 0)
+        cont_servicios = request.POST.get('contServ', 0)
+        calificacion_sitio = request.POST.get('rating', 0)
+        terminos_y_condiciones = request.POST.get('terminos') == 'on'
+
+        # Obtener el usuario actualmente autenticado
+        usuario_actual = request.user
+
+        # Crear una nueva Encuesta asociada al usuario actual
+        encuesta = Encuesta.objects.create(
+            usuario=usuario_actual,
+            cont_proveedores=cont_proveedores,
+            cont_servicios=cont_servicios,
+            calificacion_sitio=calificacion_sitio,
+            terminos_y_condiciones=terminos_y_condiciones
+        )
+        encuesta.save()
+        print(encuesta)
+
+        # Redireccionar a alguna página después de guardar los datos
+        return redirect('index')  # Cambia '/gracias/' por la URL que desees
+    print('test')
+    return render(request, 'encuestas.html')

@@ -106,6 +106,30 @@ class Servicio(models.Model):
     nombre = models.CharField(max_length=100)
     calificacion = models.IntegerField()
     tipo_empresa = models.CharField(max_length=50)
+    nombre_usuario = models.CharField(max_length=100, blank=True)
+    tipo_empresa_usuario = models.CharField(max_length=50, blank=True)
+    rubro_usuario = models.CharField(max_length=100, blank=True)
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return self.nombre
+
+    def save(self, *args, **kwargs):
+        if self.usuario:
+            self.nombre_usuario = self.usuario.nombre
+            if hasattr(self.usuario, 'tipo_empresa'):
+                self.tipo_empresa_usuario = self.usuario.tipo_empresa.nombre
+            if self.usuario.rubros.exists():
+                self.rubro_usuario = self.usuario.rubros.first().nombre
+        super().save(*args, **kwargs)
+
+class Encuesta(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    cont_proveedores = models.PositiveIntegerField()
+    cont_servicios = models.PositiveIntegerField()
+    calificacion_sitio = models.PositiveIntegerField()
+    terminos_y_condiciones = models.BooleanField()
+    fecha_registro = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"Encuesta - {self.fecha_registro}"
