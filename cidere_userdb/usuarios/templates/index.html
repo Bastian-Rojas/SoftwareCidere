@@ -16,6 +16,11 @@
     <link rel="stylesheet" href="{% static 'assets/css/owl.css' %}">
     <link rel="stylesheet" href="{% static 'assets/css/lightbox.css' %}">
 
+    <script
+			src="https://kit.fontawesome.com/81581fb069.js"
+			crossorigin="anonymous"
+		></script>
+
   </head>
 
 <body>
@@ -82,29 +87,27 @@
                 <div class="scroll-to-section"><a href="#section2">Descubre mas</a></div>
                   <div class="container py-4">
                     <div class="row">
-                        <div class="col-md-12 search">
-                            <form action="{% url 'resultados' %}" method="post">
-                                {% csrf_token %}
-                                <div id="custom-search-input">
-                                    <div class="input-group col-md-12">
-                                        <input id="query" type="text" class="form-control" placeholder="Buscar..." name="query" value="{{source.query}}">
-                                        <span class="input-group-list">
-                                            <i class="icon icon-search"></i>
-                                            <button type="submit" class="boton btn-success" name="submit">Buscar</button>
-                                        </span>
-                                    </div>
+                      <div class="col-md-12 search">
+                        <form action="{% url 'resultados' %}" method="post">
+                            {% csrf_token %}
+                            <div id="custom-search-input">
+                                <div class="input-group col-md-12">
+                                    <input id="query" type="text" class="form-control" placeholder="Buscar..." name="query" value="{{source.query}}">
+                                        <button type="submit" class="boton_buscar" name="submit">
+                                          <i class="fa-solid fa-magnifying-glass icon"> </i>Buscar</button>
                                 </div>
-                            </form>
-                        </div>    
+                            </div>
+                        </form>
+                      </div>    
                     </div>
                   </div>
                 </div>
             </div>
         </div>
     </div>
+    <script src="{% static 'assets/js/suggestions.js' %}"></script> 
   </section>
   
-
 
   <section class="features">
     <div class="container">
