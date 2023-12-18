@@ -38,14 +38,14 @@
 			src="https://kit.fontawesome.com/81581fb069.js"
 			crossorigin="anonymous"
 		></script>
-    
+
   </head>
   <body>
     <div class="constainer">
       <div class="content">
         <h1 class="tituloBusqueda">Resultados de búsqueda para "{{ query }}"</h1>
         <div class="col-md-12 search">
-          <form action="{% url 'resultados' %}" method="post">
+          <form action="{% url 'resultados' %}" id="form-busqueda" method="post">
               {% csrf_token %}
               <div id="custom-search-input">
                   <div class="input-group">
@@ -99,6 +99,20 @@
                 html += `<li class="list-group-item list-group-item-action">${element.nombre}</li>`;
               });
               document.getElementById("suggestions").innerHTML = html;
+
+              // Ahora que los elementos de la lista de sugerencias se han creado, puedes añadir el evento de clic a ellos
+              var suggestions = document.querySelectorAll('#suggestions li');
+              console.log(suggestions);
+
+              suggestions.forEach(function(suggestion) {
+                suggestion.addEventListener('click', function() {
+                  console.log(this.innerText);
+                  document.getElementById('query').value = this.innerText;
+              
+                  // Dispara un evento de clic en el botón de envío del formulario
+                  document.querySelector('#form-busqueda .boton_buscar').click();
+                });
+              });
             });
         } else {
           document.getElementById("suggestions").innerHTML = "";
