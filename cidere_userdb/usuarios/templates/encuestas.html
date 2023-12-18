@@ -6,113 +6,37 @@
     <meta name="description" content="">
     <meta name="author" content="">
     {% load static %}
+    <link rel="stylesheet" href="{% static 'assets/css/styleEncuestas.css' %}">
     <link href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700,800,900" rel="stylesheet">
     <title>Formulario de Calificación</title>
-    <style>
-        /* Estilos simples para el formulario */
-        body {
-            background-image: url("{% static 'images/camioncitos.png' %}");
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 400;
-            align-items: center; /* Centrar verticalmente */
-            min-height: 100vh; /* Para ocupar el 100% del viewport */
-        }
-        .container{
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 10px;
-        }
-        .content{
-            background:#fff;
-            padding: 15px;
-            border-radius: 10px;
-        }
-        .place{
-            border-radius: 5px;
-            border: 1px solid #cccccc;
-            padding: 10px;
-            font-size: 13px;
-            outline: none;
-        }
-        .titleForm{
-            font-weight: 700;
-            font-size: 25px;
-        }
-        .subtitle{
-            font-weight: 500;
-            font-size: 15px;
-        }
-        .stars {
-            display: flex;
-            width: 100%;
-           /* justify-content: flex-end;*/ /* Para mantener las estrellas a la izquierda */
-        }
-        .stard{
-            width: 100%;
-        }
-        .star {
-            cursor: pointer;
-            font-size: 30px;
-        }
-        .star:hover,
-        .star:hover ~ .star {
-            color: orange;
-        }
-        .star.selected,
-        .star.selected ~ .star {
-            color: orange;
-        }
-
-
-        .listTerms{
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .confirmation{
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-        }
-        .check{
-            text-align: center;
-            vertical-align: middle;
-        }
-        .bsubmit {
-            padding: 8px;
-            background-color: #4CAF50;
-            color: white;
-            font-family: 'Montserrat', sans-serif;
-            border: none;
-            cursor: pointer;
-        }
-        
-    </style>
+   
 </head>
 <body>
     <div class="container">
         <div class="content">
             <h1 class="titleForm">Formulario de Calificación</h1>
 
-            <form id="encuestaForm" action="{% url 'encuestas' %}" method="POST">
+            <form id="encuestaForm" action="{% url 'encuestas' %}" method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
 
                 <div class="form-group">
                     <h3 class="subtitle">¿Cuántos proveedores se han contactado con su empresa en los últimos 6 meses?</h3>
-                    <input class="place" type="text" name="contProve" id="contProve" class="form-control" placeholder="Por favor, ingrese números">
+                    <input class="place" type="text" name="contProve" id="contProve" class="form-control" placeholder="Por favor, ingrese números" required>
                 </div>
         
                 <div class="form-group">
-                    <h3 class="subtitle">¿Cuántos servicios se han brindado su empresa en los últimos 6 meses?</h3>
-                    <input class="place" type="text" name="contServ" id="contServ" class="form-control" placeholder="Por favor, ingrese números">
+                    <h3 class="subtitle">¿Cuántos servicios se han brindado a su empresa en los últimos 6 meses?</h3>
+                    <input class="place" type="text" name="contServ" id="contServ" class="form-control" placeholder="Por favor, ingrese números" required>
                 </div>
 
+                <div class="form-group">
+                    {% csrf_token %}
+                    <input type="file" name="arch_licitacion" accept=".pdf" required>
+                </div>
+
+
                 <h3 class="subtitle">Por favor, ingrese la calificación que le daría al sitio</h3>
-                <input type="hidden" name="rating" id="rating" value="0">
+                <input type="hidden" name="rating" id="rating" value="0" required> 
                 <div class="stars">
                         <span class="star" data-value="5">★</span>
                         <span class="star" data-value="4">★</span>
@@ -131,7 +55,7 @@
                     </div>
                     <div class="confirmation">
                         <h4>Acepto los términos y condiciones.</h4>
-                        <input class="check" type="checkbox" id="terminos" name="terminos"> 
+                        <input class="check" type="checkbox" id="terminos" name="terminos" required> 
                     </div>                        
                 </div>
                 
