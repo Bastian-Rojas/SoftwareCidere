@@ -31,5 +31,6 @@ urlpatterns = [
     path('cargar-tipo_empresa/', views.cargar_tipo_empresa, name='cargar_tipo_empresa'),
     path('cargar-tamanos_empresa/', views.cargar_tamanos_empresa, name='cargar_tamanos_empresa'),
     path('resultados/', views.resultado_busqueda, name='resultados'),
+    path('sugerencias/', views.resultado_sugerencias, name='sugerencias'),
     path('encuestas/', views.cargar_encuestas, name='encuestas'),
 ]

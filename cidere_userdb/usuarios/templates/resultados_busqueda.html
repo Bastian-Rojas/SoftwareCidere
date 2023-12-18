@@ -33,11 +33,36 @@
     />
     <link rel="stylesheet" href="{% static 'assets/css/owl.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/lightbox.css' %}" />
+
+    <script
+			src="https://kit.fontawesome.com/81581fb069.js"
+			crossorigin="anonymous"
+		></script>
+    
   </head>
   <body>
     <div class="constainer">
       <div class="content">
         <h1 class="tituloBusqueda">Resultados de búsqueda para "{{ query }}"</h1>
+        <div class="col-md-12 search">
+          <form action="{% url 'resultados' %}" method="post">
+              {% csrf_token %}
+              <div id="custom-search-input">
+                  <div class="input-group">
+                      <input id="query" type="text" class="form-control" placeholder="Buscar..." name="query" value="{{source.query}}">
+                          <button type="submit" class="boton_buscar" name="submit">
+                            <i class="fa-solid fa-magnifying-glass icon"> </i>
+                            <span>Buscar</span></button>
+                  </div>
+              </div>
+          </form>
+          <div class="col-md-11 p-0">
+            <ul class="list-group" id="suggestions">
+    
+            </ul>
+          </div>
+        </div>
+        <hr class="separador"/>
         <div class="resultados">
             {% if usuarios %}
             <ul class="listaresultados">
@@ -60,5 +85,25 @@
         </div>
       </div>
     </div>
+    <script>
+      const buscador = document.getElementById("query");
+      buscador.addEventListener("keyup", () => {
+        console.log(buscador.value);
+        if (buscador.value.length > 0) {
+          fetch("{% url 'sugerencias' %}?query=" + buscador.value)
+            .then((res) => res.json())
+            .then((data) => {
+              console.log(data);
+              let html = "";
+              data.usuarios.forEach((element) => {
+                html += `<li class="list-group-item list-group-item-action">${element.nombre}</li>`;
+              });
+              document.getElementById("suggestions").innerHTML = html;
+            });
+        } else {
+          document.getElementById("suggestions").innerHTML = "";
+        }
+      });
+    </script>  
   </body>
 </html>

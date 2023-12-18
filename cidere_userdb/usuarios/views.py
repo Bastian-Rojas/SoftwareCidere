@@ -161,6 +161,25 @@ def resultado_busqueda(request):
 
     return render(request, 'resultados_busqueda.html', {'usuarios': usuarios, 'query': query})
 
+def resultado_sugerencias(request):
+    if request.method == 'GET':
+        query = request.GET.get('query', '')
+        if query:
+            palabras_busqueda = query.split(" ")
+            queryset = Usuario.objects.all()
+
+            for palabra in palabras_busqueda:
+                queryset = queryset.filter(
+                    Q(nombre__icontains=palabra) |
+                    Q(tipo_empresa__nombre__icontains=palabra) |
+                    Q(rubros__nombre__icontains=palabra)
+                )
+
+            usuarios = queryset.distinct().values('nombre')  # Cambia 'nombre' por los campos que necesites
+            return JsonResponse({'usuarios': list(usuarios), 'query': query})
+
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
 def cargar_encuestas(request):
     if request.method == 'POST':
         print('test2')

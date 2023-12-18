@@ -91,13 +91,19 @@
                         <form action="{% url 'resultados' %}" method="post">
                             {% csrf_token %}
                             <div id="custom-search-input">
-                                <div class="input-group col-md-12">
+                                <div class="input-group">
                                     <input id="query" type="text" class="form-control" placeholder="Buscar..." name="query" value="{{source.query}}">
                                         <button type="submit" class="boton_buscar" name="submit">
-                                          <i class="fa-solid fa-magnifying-glass icon"> </i>Buscar</button>
+                                          <i class="fa-solid fa-magnifying-glass icon"> </i>
+                                          <span>Buscar</span></button>
                                 </div>
                             </div>
                         </form>
+                        <div class="col-md-11 p-0">
+                          <ul class="list-group" id="suggestions">
+
+                          </ul>
+                        </div>
                       </div>    
                     </div>
                   </div>
@@ -105,7 +111,6 @@
             </div>
         </div>
     </div>
-    <script src="{% static 'assets/js/suggestions.js' %}"></script> 
   </section>
   
 
@@ -438,7 +443,6 @@
 
   <script src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
   <script src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
-  
   <script src="{% static 'assets/js/isotope.min.js' %}"></script>
   <script src="{% static 'assets/js/owl-carousel.js' %}"></script>
   <script src="{% static 'assets/js/lightbox.js' %}"></script>
@@ -495,6 +499,28 @@
           checkSection();
       });
   </script>
+
+  <script>
+    const buscador = document.getElementById("query");
+    buscador.addEventListener("keyup", () => {
+      console.log(buscador.value);
+      if (buscador.value.length > 0) {
+        fetch("{% url 'sugerencias' %}?query=" + buscador.value)
+          .then((res) => res.json())
+          .then((data) => {
+            console.log(data);
+            let html = "";
+            data.usuarios.forEach((element) => {
+              html += `<li class="list-group-item list-group-item-action">${element.nombre}</li>`;
+            });
+            document.getElementById("suggestions").innerHTML = html;
+          });
+      } else {
+        document.getElementById("suggestions").innerHTML = "";
+      }
+    });
+  </script>   
+
   <div id="loginPopup" class="popup">
     <div class="popup-content">
         <span class="close">&times;</span>
