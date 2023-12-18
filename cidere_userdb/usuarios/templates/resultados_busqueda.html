@@ -1,123 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Resultados de Búsqueda</title>
 
-    <link
-      href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700,800,900"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:100,200,300,400,500,600,700,800,900" rel="stylesheet" />
     <link href="/static/assets/css/login.css" rel="stylesheet" />
     <link href="/static/assets/css/busqueda.css" rel="stylesheet" />
     <title>Mercado Cidere Login</title>
     {% load static %}
     <link href="{% static 'assets/css/styles.css' %}" rel="stylesheet" />
-    <link
-      href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
-      rel="stylesheet"
-      id="bootstrap-css"
-    />
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css" />
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <link
-      href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}"
-      rel="stylesheet"
-    />
+    <link href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet" />
     <link rel="stylesheet" href="{% static 'assets/css/fontawesome.css' %}" />
-    <link
-      rel="stylesheet"
-      href="{% static 'assets/css/templatemo-mercado-cidere.css' %}"
-    />
+    <link rel="stylesheet" href="{% static 'assets/css/templatemo-mercado-cidere.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/owl.css' %}" />
     <link rel="stylesheet" href="{% static 'assets/css/lightbox.css' %}" />
 
-    <script
-			src="https://kit.fontawesome.com/81581fb069.js"
-			crossorigin="anonymous"
-		></script>
+    <script src="https://kit.fontawesome.com/81581fb069.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  
+    <div class="container">
+        <div class="row">
+            <!-- Columna de Filtros -->
+            <div class="col-md-4 filtros">
+                <h1 class="tituloBusqueda">Filtros</h1>
+                <form action="{% url 'resultados' %}" id="form-busqueda" method="post">
+                    {% csrf_token %}
+                    <div id="custom-search-input">
+                        <div class="input-group">
+                            <input id="query" type="text" class="form-control" placeholder="Buscar..." name="query" value="{{ query }}">
+                            <button type="submit" class="boton_buscar" name="submit">
+                                <i class="fa-solid fa-magnifying-glass icon"></i>
+                                <span>Buscar</span>
+                            </button>
+                        </div>
+                    </div>
 
-  </head>
-  <body>
-    <div class="constainer">
-      <div class="content">
-        <h1 class="tituloBusqueda">Resultados de búsqueda para "{{ query }}"</h1>
-        <div class="col-md-12 search">
-          <form action="{% url 'resultados' %}" id="form-busqueda" method="post">
-              {% csrf_token %}
-              <div id="custom-search-input">
-                  <div class="input-group">
-                      <input id="query" type="text" class="form-control" placeholder="Buscar..." name="query" value="{{source.query}}">
-                          <button type="submit" class="boton_buscar" name="submit">
-                            <i class="fa-solid fa-magnifying-glass icon"> </i>
-                            <span>Buscar</span></button>
+                    <!-- Filtro de orden alfabético -->
+                    <select name="orden">
+                        <option value="A-Z">A-Z</option>
+                        <option value="Z-A">Z-A</option>
+                    </select>
+
+                    <!-- Filtro por tipo de empresa -->
+                    <div class="accordion" id="accordionFiltros">
+                      <div class="accordion-item">
+                          <h2 class="accordion-header" id="headingTipoEmpresa">
+                              <button class="accordion-button collapsed boton-acordeon-pequeno" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTipoEmpresa" aria-expanded="false" aria-controls="collapseTipoEmpresa">
+                                  Tipo de Empresa
+                              </button>
+                          </h2>
+                          <div id="collapseTipoEmpresa" class="accordion-collapse collapse" aria-labelledby="headingTipoEmpresa" data-bs-parent="#accordionFiltros">
+                              <div class="accordion-body">
+                                  <!-- Checkbox para cada tipo de empresa -->
+                                  {% for tipo in tipos_empresa %}
+                                      <div class="form-check">
+                                          <input class="form-check-input" type="checkbox" name="tipo_empresa" value="{{ tipo.id }}" id="tipoEmpresa{{ tipo.id }}">
+                                          <label class="form-check-label" for="tipoEmpresa{{ tipo.id }}">
+                                              {{ tipo.nombre }}
+                                          </label>
+                                      </div>
+                                  {% endfor %}
+                              </div>
+                          </div>
+                      </div>
+                      <div class="accordion-item">
+                        <h2 class="accordion-header" id="headingRubros">
+                            <button class="accordion-button collapsed boton-acordeon-pequeno" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRubros" aria-expanded="false" aria-controls="collapseRubros">
+                                Rubros
+                            </button>
+                        </h2>
+                        <div id="collapseRubros" class="accordion-collapse collapse" aria-labelledby="headingRubros" data-bs-parent="#accordionFiltros">
+                            <div class="accordion-body">
+                                <!-- Checkbox para cada rubro -->
+                                {% for rubro in rubros %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="rubro" value="{{ rubro.id }}" id="rubro{{ rubro.id }}">
+                                        <label class="form-check-label" for="rubro{{ rubro.id }}">
+                                            {{ rubro.nombre }}
+                                        </label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                   </div>
-              </div>
-          </form>
-          <div class="col-md-11 p-0">
-            <ul class="list-group" id="suggestions">
-    
-            </ul>
-          </div>
+
+                    <button type="submit">Aplicar filtros</button>
+                    <button type="button" id="boton-reiniciar">Reiniciar Filtros</button>
+                </form>
+            </div>
+
+            <!-- Columna de Resultados de Búsqueda -->
+            <div class="col-md-8">
+                <h1 class="tituloBusqueda tituloFondo">Resultados de búsqueda para "{{ query }}"</h1>
+                <div class="resultados">
+                    {% if usuarios %}
+                    <ul class="listaresultados">
+                        {% for usuario in usuarios %}
+                        <li class="resultadoBusqueda">
+                            <h3 class="resultadoNombre">{{ usuario.nombre }}</h3>
+                            <hr class="separador"/>
+                            <p class="resultadoTipoEmpresa">Tipo de empresa: {{ usuario.tipo_empresa.nombre }}</p>
+                            <p class="resultadoRubro">Rubros:
+                                {% for rubro in usuario.rubros.all %}
+                                    {{ rubro.nombre }}{% if not forloop.last %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="noResultados tituloFondo">No se encontraron resultados para "{{ query }}".</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <hr class="separador"/>
-        <div class="resultados">
-            {% if usuarios %}
-            <ul class="listaresultados">
-              {% for usuario in usuarios %}
-              <li class="resultadoBusqueda" >
-                <h3 class="resultadoNombre" >{{ usuario.nombre }}</h3>
-                <hr class="separador"/>
-                <p class="resultadoTipoEmpresa">Tipo de empresa: {{ usuario.tipo_empresa.nombre }}</p>
-                <p class="resultadoRubro">Rubros:
-                    {% for rubro in usuario.rubros.all %}
-                        {{ rubro.nombre }}{% if not forloop.last %}, {% endif %}
-                    {% endfor %}
-                </p>
-              </li>
-              {% endfor %}
-            </ul>
-            {% else %}
-            <p class="noResultados">No se encontraron resultados para "{{ query }}".</p>
-            {% endif %}
-        </div>
-      </div>
     </div>
+    <a href="/" class="boton-volver-inicio">Volver</a>
     <script>
       const buscador = document.getElementById("query");
       buscador.addEventListener("keyup", () => {
-        console.log(buscador.value);
-        if (buscador.value.length > 0) {
-          fetch("{% url 'sugerencias' %}?query=" + buscador.value)
-            .then((res) => res.json())
-            .then((data) => {
-              console.log(data);
-              let html = "";
-              data.usuarios.forEach((element) => {
-                html += `<li class="list-group-item list-group-item-action">${element.nombre}</li>`;
-              });
-              document.getElementById("suggestions").innerHTML = html;
-
-              // Ahora que los elementos de la lista de sugerencias se han creado, puedes añadir el evento de clic a ellos
-              var suggestions = document.querySelectorAll('#suggestions li');
-              console.log(suggestions);
-
-              suggestions.forEach(function(suggestion) {
-                suggestion.addEventListener('click', function() {
-                  console.log(this.innerText);
-                  document.getElementById('query').value = this.innerText;
-              
-                  // Dispara un evento de clic en el botón de envío del formulario
-                  document.querySelector('#form-busqueda .boton_buscar').click();
-                });
-              });
-            });
-        } else {
-          document.getElementById("suggestions").innerHTML = "";
-        }
+          console.log(buscador.value);
+          if (buscador.value.length > 0) {
+              fetch("{% url 'sugerencias' %}?query=" + buscador.value)
+                  .then((res) => res.json())
+                  .then((data) => {
+                      console.log(data);
+                      let html = "";
+                      data.usuarios.forEach((element) => {
+                          html += `<li class="list-group-item list-group-item-action">${element.nombre}</li>`;
+                      });
+                      document.getElementById("suggestions").innerHTML = html;
+  
+                      var suggestions = document.querySelectorAll('#suggestions li');
+                      console.log(suggestions);
+  
+                      suggestions.forEach(function(suggestion) {
+                          suggestion.addEventListener('click', function() {
+                              console.log(this.innerText);
+                              document.getElementById('query').value = this.innerText;
+                              document.querySelector('#form-busqueda .boton_buscar').click();
+                          });
+                      });
+                  });
+          } else {
+              document.getElementById("suggestions").innerHTML = "";
+          }
       });
-    </script>  
-  </body>
+    </script>
+
+    <script>
+      document.getElementById("form-busqueda").addEventListener("submit", function(event){
+          event.preventDefault();
+          const data = new FormData(this);
+          fetch("{% url 'resultados' %}", {
+              method: 'POST',
+              body: data,
+              headers: {
+                  'X-Requested-With': 'XMLHttpRequest',
+                  'X-CSRFToken': '{{ csrf_token }}'
+              }
+          })
+          .then(response => response.json())
+          .then(data => {
+              let resultadosHTML = '';
+              data.usuarios.forEach(usuario => {
+                  resultadosHTML += `
+                      <li class="resultadoBusqueda">
+                          <h3 class="resultadoNombre">${usuario.nombre}</h3>
+                          <hr class="separador"/>
+                          <p class="resultadoTipoEmpresa">Tipo de empresa: ${usuario.tipo_empresa__nombre}</p>
+                          <p class="resultadoRubro">Rubros: ${usuario.rubros__nombre}</p>
+                      </li>`;
+              });
+              const resultadosContainer = document.querySelector('.listaresultados');
+              resultadosContainer.innerHTML = resultadosHTML; // Limpia y agrega los nuevos resultados
+          })
+          .catch(error => console.error('Error:', error));
+      });
+      document.getElementById("boton-reiniciar").addEventListener("click", function() {
+        // Limpia los campos del formulario
+        document.getElementById("form-busqueda").reset();
+
+        // Opcionalmente, realiza una solicitud AJAX para obtener todos los usuarios
+        fetch("{% url 'resultados' %}", {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            let resultadosHTML = '';
+            data.usuarios.forEach(usuario => {
+                resultadosHTML += `
+                    <li class="resultadoBusqueda">
+                        <h3 class="resultadoNombre">${usuario.nombre}</h3>
+                        <hr class="separador"/>
+                        <p class="resultadoTipoEmpresa">Tipo de empresa: ${usuario.tipo_empresa__nombre}</p>
+                        <p class="resultadoRubro">Rubros: ${usuario.rubros__nombre}</p>
+                    </li>`;
+            });
+            document.querySelector('.listaresultados').innerHTML = resultadosHTML;
+        })
+        .catch(error => console.error('Error:', error));
+    });
+  </script>
+  
+  
+</body>
 </html>

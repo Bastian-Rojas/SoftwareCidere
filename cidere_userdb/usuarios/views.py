@@ -8,6 +8,7 @@ from django.core.validators import validate_email
 from .models import Usuario, Provincia, Comuna, Region, Rubro, Tipo_Empresa, Tamano_Empresa, Servicio, Encuesta
 from django.db.models import Q
 
+
 def cargar_regiones(request):
     regiones = Region.objects.all().order_by('id')
     return JsonResponse(list(regiones.values('id', 'nombre')), safe=False)
@@ -140,26 +141,55 @@ def user_logout(request):
     messages.success(request, "Has cerrado sesión exitosamente.")
     return redirect('index')
 
+from django.shortcuts import render
+from django.http import JsonResponse
+from .models import Usuario, Tipo_Empresa, Rubro
+from django.db.models import Q
+
 def resultado_busqueda(request):
     if request.method == 'POST':
-        query = request.POST.get('query', '')  # Se espera que 'query' sea pasado como parámetro en la URL
-        print(f"Consulta recibida: '{query}'")  # Depuración
+        query = request.POST.get('query', '').strip()
+        orden = request.POST.get('orden', 'A-Z')
+        tipo_empresa_id = request.POST.getlist('tipo_empresa')
+        rubro_id = request.POST.getlist('rubro')
 
-    if query:
-        palabras_busqueda = query.split(" ")
         queryset = Usuario.objects.all()
-        print(f"Usuarios antes de filtrar: {queryset.count()}")  # Depuración
 
-        for palabra in palabras_busqueda:
-            queryset = queryset.filter(nombre__icontains=palabra) | queryset.filter(Q(tipo_empresa__nombre__icontains=palabra)) | queryset.filter(Q(rubros__nombre__icontains=palabra))
-            print(f"Usuarios después de filtrar por '{palabra}': {queryset.count()}")  # Depuración
+        if query:
+            palabras_busqueda = query.split(" ")
+            for palabra in palabras_busqueda:
+                queryset = queryset.filter(
+                    Q(nombre__icontains=palabra) |
+                    Q(tipo_empresa__nombre__icontains=palabra) |
+                    Q(rubros__nombre__icontains=palabra)
+                )
 
-        usuarios = queryset.distinct()
-        print(f"Usuarios encontrados: {usuarios.count()}")  # Depuración
+        if tipo_empresa_id:
+            queryset = queryset.filter(tipo_empresa__id__in=tipo_empresa_id)
+
+        if rubro_id:
+            queryset = queryset.filter(rubros__id__in=rubro_id)
+
+        if orden == 'Z-A':
+            queryset = queryset.order_by('-nombre')
+        else:
+            queryset = queryset.order_by('nombre')
+
+        # Verificar si la solicitud es AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            usuarios = queryset.distinct().values('nombre', 'tipo_empresa__nombre', 'rubros__nombre')
+            return JsonResponse({'usuarios': list(usuarios)})
+        else:
+            usuarios = queryset.distinct()
+            tipos_empresa = Tipo_Empresa.objects.all()
+            rubros = Rubro.objects.all()
+            return render(request, 'resultados_busqueda.html', {'usuarios': usuarios, 'query': query, 'tipos_empresa': tipos_empresa, 'rubros': rubros})
     else:
-        usuarios = Usuario.objects.none()
-
-    return render(request, 'resultados_busqueda.html', {'usuarios': usuarios, 'query': query})
+        # Manejar casos que no son POST (puede ser GET u otros)
+        # Aquí puedes decidir qué hacer, como mostrar un formulario de búsqueda vacío o redirigir
+        tipos_empresa = Tipo_Empresa.objects.all()
+        rubros = Rubro.objects.all()
+        return render(request, 'resultados_busqueda.html', {'tipos_empresa': tipos_empresa, 'rubros': rubros})
 
 def resultado_sugerencias(request):
     if request.method == 'GET':
@@ -174,7 +204,6 @@ def resultado_sugerencias(request):
                     Q(tipo_empresa__nombre__icontains=palabra) |
                     Q(rubros__nombre__icontains=palabra)
                 )
-
             usuarios = queryset.distinct().values('nombre')  # Cambia 'nombre' por los campos que necesites
             return JsonResponse({'usuarios': list(usuarios), 'query': query})
 
@@ -185,7 +214,6 @@ def cargar_encuestas(request):
         print('test2')
         cont_proveedores = request.POST.get('contProve', 0)
         cont_servicios = request.POST.get('contServ', 0)
-        adj_licitacion = request.FILES.get('arch_licitacion')
         calificacion_sitio = request.POST.get('rating', 0)
         terminos_y_condiciones = request.POST.get('terminos') == 'on'
 
@@ -197,7 +225,6 @@ def cargar_encuestas(request):
             usuario=usuario_actual,
             cont_proveedores=cont_proveedores,
             cont_servicios=cont_servicios,
-            adj_licitacion=adj_licitacion,
             calificacion_sitio=calificacion_sitio,
             terminos_y_condiciones=terminos_y_condiciones
         )

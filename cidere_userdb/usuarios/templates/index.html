@@ -44,13 +44,17 @@
       <li><a href="#section7">Licitaciones</a></li>
       {% if request.user.is_authenticated %}
       <!-- Menú desplegable para usuario autenticado -->
-      <li class="has-submenu"><a href="{% url 'login' %}">Hola, {{ request.user.nombre }}!</a>
+      <li class="has-submenu">
+        <a href="{% url 'login' %}">Hola, {{ request.user.nombre }}!</a>
         <ul class="sub-menu">
-          <li href="{% url 'logout' %}" class="btn btn-warning">Cerrar Sesión</li>
-          
+            <li>
+                <form action="{% url 'logout' %}" method="post" class="centrar-boton">
+                    {% csrf_token %}
+                    <button type="submit" class="btn_cerrar-sesion">Cerrar Sesión</button>
+                </form>
+            </li>
         </ul>
-        
-      </li>
+    </li>
     {% else %}
       <!-- Enlace para iniciar sesión si el usuario no está autenticado -->
       <li><a href="javascript:void(0)" id="loginButton">Acceder</a></li>

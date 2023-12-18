@@ -122,12 +122,11 @@ class Servicio(models.Model):
             if self.usuario.rubros.exists():
                 self.rubro_usuario = self.usuario.rubros.first().nombre
         super().save(*args, **kwargs)
-        
+
 class Encuesta(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
     cont_proveedores = models.PositiveIntegerField()
     cont_servicios = models.PositiveIntegerField()
-    adj_licitacion = models.FileField(upload_to='licitaciones/',null=True, blank=True)
     calificacion_sitio = models.PositiveIntegerField()
     terminos_y_condiciones = models.BooleanField()
     fecha_registro = models.DateTimeField(auto_now_add=True)

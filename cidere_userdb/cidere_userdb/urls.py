@@ -15,10 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, re_path
+from django.urls import path
 from usuarios import views
-from django.conf import settings
-from django.views.static import serve
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -35,10 +33,4 @@ urlpatterns = [
     path('resultados/', views.resultado_busqueda, name='resultados'),
     path('sugerencias/', views.resultado_sugerencias, name='sugerencias'),
     path('encuestas/', views.cargar_encuestas, name='encuestas'),
-]
-
-urlpatterns += [
-    re_path(r'^licitaciones/(?P<path>.*)$', serve, {
-        'document_root': settings.MEDIA_ROOT,
-    }),
 ]
