@@ -185,6 +185,7 @@ def cargar_encuestas(request):
         print('test2')
         cont_proveedores = request.POST.get('contProve', 0)
         cont_servicios = request.POST.get('contServ', 0)
+        adj_licitacion = request.FILES.get('arch_licitacion')
         calificacion_sitio = request.POST.get('rating', 0)
         terminos_y_condiciones = request.POST.get('terminos') == 'on'
 
@@ -196,6 +197,7 @@ def cargar_encuestas(request):
             usuario=usuario_actual,
             cont_proveedores=cont_proveedores,
             cont_servicios=cont_servicios,
+            adj_licitacion=adj_licitacion,
             calificacion_sitio=calificacion_sitio,
             terminos_y_condiciones=terminos_y_condiciones
         )
